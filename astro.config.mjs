@@ -6,6 +6,7 @@ import mdx from '@astrojs/mdx';
 export default defineConfig({
   site: 'https://angelpv16.github.io',
   base: '/codeatlas',
+  trailingSlash: 'always',
   integrations: [
     tailwind(),
     react(),
