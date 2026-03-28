@@ -14,6 +14,12 @@ npm-debug.log*
 # macOS
 .DS_Store
 
+# Astro generated
+.astro/
+
+# Claude Code
+.claude/
+
 # IDE
 .vscode/
 *.swp
