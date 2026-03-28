@@ -1,0 +1,56 @@
+---
+import { t } from '../i18n/utils';
+import type { Lang } from '../i18n/utils';
+
+interface Props {
+  title: string;
+  titleEs: string;
+  description: string;
+  descriptionEs: string;
+  level: 'beginner' | 'intermediate' | 'advanced';
+  estimatedMinutes: number;
+  slug: string;
+  lang?: Lang;
+}
+
+const {
+  title,
+  titleEs,
+  description,
+  descriptionEs,
+  level,
+  estimatedMinutes,
+  slug,
+  lang = 'en',
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const displayTitle = lang === 'es' ? titleEs : title;
+const displayDesc = lang === 'es' ? descriptionEs : description;
+const levelLabel = t(`concepts.${level}`, lang);
+const readTime = t('concepts.readTime', lang);
+
+const badgeClass = {
+  beginner: 'atlas-badge-beginner',
+  intermediate: 'atlas-badge-intermediate',
+  advanced: 'atlas-badge-advanced',
+}[level];
+---
+<a href={`${base}learn/${slug}/`} class="atlas-card group block">
+  <div class="flex items-center gap-2 mb-3">
+    <span class={badgeClass}>{levelLabel}</span>
+    <span class="text-xs text-atlas-muted">{estimatedMinutes} {readTime}</span>
+  </div>
+  <h3 class="text-lg font-semibold text-atlas-text-bright mb-2 group-hover:text-atlas-accent transition-colors" data-i18n-title>
+    {displayTitle}
+  </h3>
+  <p class="text-sm text-atlas-muted leading-relaxed mb-4" data-i18n-desc>
+    {displayDesc}
+  </p>
+  <span class="inline-flex items-center text-sm text-atlas-accent font-medium group-hover:gap-2 transition-all">
+    <span>{lang === 'es' ? 'Leer' : 'Read'}</span>
+    <svg class="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+  </span>
+</a>

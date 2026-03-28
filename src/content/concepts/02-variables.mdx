@@ -1,0 +1,109 @@
+---
+title: "Variables"
+titleEs: "Variables"
+description: "Learn what variables are, how to create them in Python, and the rules for naming them."
+descriptionEs: "Aprende qué son las variables, cómo crearlas en Python y las reglas para nombrarlas."
+order: 2
+level: "beginner"
+estimatedMinutes: 10
+tags: ["python", "variables", "basics"]
+relatedConcepts: ["01-what-is-programming", "03-data-types"]
+hasAnimation: false
+publishedAt: 2025-01-15
+---
+
+## The Labeled Box Analogy
+
+Imagine you have a box. You can put something inside it — a number, a name, a color — and you stick a label on the front so you know what's in it. That's exactly what a **variable** is in programming: a named container that holds a value.
+
+```python
+name = "Alex"
+age = 25
+is_student = True
+```
+
+In this example:
+- `name` is a box labeled "name" containing the text `"Alex"`
+- `age` is a box labeled "age" containing the number `25`
+- `is_student` is a box labeled "is_student" containing the value `True`
+
+## Creating Variables in Python
+
+Python makes creating variables incredibly simple. You don't need to declare a type or use any special keyword — just pick a name, use the `=` sign, and assign a value:
+
+```python
+city = "Tokyo"
+temperature = 22.5
+population = 14000000
+```
+
+The `=` sign here doesn't mean "equals" in the math sense. It means **"assign the value on the right to the name on the left."**
+
+## Updating Variables
+
+Variables can change. That's why they're called *variables* — their values can vary:
+
+```python
+score = 0
+print(score)  # Output: 0
+
+score = 10
+print(score)  # Output: 10
+
+score = score + 5
+print(score)  # Output: 15
+```
+
+When Python sees `score = score + 5`, it:
+1. Reads the current value of `score` (10)
+2. Adds 5 to it (15)
+3. Stores the result back in `score`
+
+## Variable Naming Rules
+
+Python has a few rules for variable names:
+
+| Rule | Valid | Invalid |
+|------|-------|---------|
+| Must start with a letter or underscore | `name`, `_count` | `2name` |
+| Can contain letters, numbers, underscores | `player_1` | `player-1` |
+| Case-sensitive | `age` ≠ `Age` | — |
+| Cannot be a Python keyword | `my_class` | `class` |
+
+### Best Practices
+
+```python
+# ✅ Good: descriptive, snake_case
+user_name = "Alex"
+total_score = 100
+is_active = True
+
+# ❌ Bad: unclear, inconsistent
+x = "Alex"
+TotalScore = 100
+ISACTIVE = True
+```
+
+Python convention uses **snake_case** — lowercase words separated by underscores.
+
+## Common Mistake: `=` vs `==`
+
+This trips up almost every beginner:
+
+```python
+# Assignment — puts a value INTO a variable
+age = 25
+
+# Comparison — checks if two values are EQUAL
+age == 25  # Returns True
+age == 30  # Returns False
+```
+
+- **One `=`** means "assign this value"
+- **Two `==`** means "is this equal to?"
+
+You'll use `==` a lot more once we get to conditionals, but for now, just remember: when creating or updating a variable, use a single `=`.
+
+## What's Next?
+
+You've seen that variables can hold text, numbers, and `True`/`False` values. But what's the difference between these types? That's what **data types** are all about.

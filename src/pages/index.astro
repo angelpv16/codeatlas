@@ -1,0 +1,180 @@
+---
+import Layout from '../components/layout/Layout.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import ConceptCard from '../components/ConceptCard.astro';
+import { getCollection } from 'astro:content';
+import { t, getLangFromUrl } from '../i18n/utils';
+import type { Lang } from '../i18n/utils';
+
+const lang: Lang = getLangFromUrl(Astro.url);
+const concepts = await getCollection('concepts');
+const featured = concepts.sort((a, b) => a.data.order - b.data.order).slice(0, 4);
+const base = import.meta.env.BASE_URL;
+---
+<Layout title={`CodeAtlas — ${t('hero.title', lang)}`} lang={lang}>
+  <Header lang={lang} />
+
+  <main class="flex-1">
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden py-24 sm:py-32">
+      <!-- Background animation -->
+      <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-atlas-accent/5 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-atlas-secondary/5 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+        <!-- Floating code lines -->
+        <div class="absolute top-20 right-10 text-atlas-accent/10 font-mono text-sm hidden lg:block">
+          <div class="animate-float">print("Hello, world!")</div>
+          <div class="animate-float" style="animation-delay: 0.5s;">name = "Atlas"</div>
+          <div class="animate-float" style="animation-delay: 1s;">x = 42</div>
+        </div>
+      </div>
+
+      <div class="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-atlas-text-bright leading-tight mb-6" data-i18n="hero.title">
+          {t('hero.title', lang)}
+        </h1>
+        <p class="text-lg sm:text-xl text-atlas-muted max-w-2xl mx-auto mb-10" data-i18n="hero.subtitle">
+          {t('hero.subtitle', lang)}
+        </p>
+        <a href={`${base}map/`} class="atlas-btn-primary text-lg">
+          <span data-i18n="hero.cta">{t('hero.cta', lang)}</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- What is CodeAtlas -->
+    <section class="py-24 border-t border-atlas-border">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <h2 class="text-3xl font-bold text-atlas-text-bright text-center mb-16" data-i18n="features.title">
+          {t('features.title', lang)}
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Visual Learning -->
+          <div class="atlas-card text-center">
+            <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-atlas-accent/10 flex items-center justify-center">
+              <svg class="w-6 h-6 text-atlas-accent" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-atlas-text-bright mb-2" data-i18n="features.visual.title">{t('features.visual.title', lang)}</h3>
+            <p class="text-sm text-atlas-muted leading-relaxed" data-i18n="features.visual.desc">{t('features.visual.desc', lang)}</p>
+          </div>
+
+          <!-- Progressive Path -->
+          <div class="atlas-card text-center">
+            <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-atlas-secondary/10 flex items-center justify-center">
+              <svg class="w-6 h-6 text-atlas-secondary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-atlas-text-bright mb-2" data-i18n="features.progressive.title">{t('features.progressive.title', lang)}</h3>
+            <p class="text-sm text-atlas-muted leading-relaxed" data-i18n="features.progressive.desc">{t('features.progressive.desc', lang)}</p>
+          </div>
+
+          <!-- Python First -->
+          <div class="atlas-card text-center">
+            <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-purple-500/10 flex items-center justify-center">
+              <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-atlas-text-bright mb-2" data-i18n="features.python.title">{t('features.python.title', lang)}</h3>
+            <p class="text-sm text-atlas-muted leading-relaxed" data-i18n="features.python.desc">{t('features.python.desc', lang)}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Concepts -->
+    <section class="py-24 border-t border-atlas-border">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <h2 class="text-3xl font-bold text-atlas-text-bright text-center mb-16" data-i18n="featured.title">
+          {t('featured.title', lang)}
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {featured.map((concept) => (
+            <ConceptCard
+              title={concept.data.title}
+              titleEs={concept.data.titleEs}
+              description={concept.data.description}
+              descriptionEs={concept.data.descriptionEs}
+              level={concept.data.level}
+              estimatedMinutes={concept.data.estimatedMinutes}
+              slug={concept.slug}
+              lang={lang}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="py-24 border-t border-atlas-border">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6">
+        <h2 class="text-3xl font-bold text-atlas-text-bright text-center mb-16" data-i18n="howItWorks.title">
+          {t('howItWorks.title', lang)}
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Step 1 -->
+          <div class="text-center">
+            <div class="w-10 h-10 mx-auto mb-4 rounded-full bg-atlas-accent/10 flex items-center justify-center text-atlas-accent font-bold">
+              1
+            </div>
+            <h3 class="text-lg font-semibold text-atlas-text-bright mb-2" data-i18n="howItWorks.step1.title">{t('howItWorks.step1.title', lang)}</h3>
+            <p class="text-sm text-atlas-muted" data-i18n="howItWorks.step1.desc">{t('howItWorks.step1.desc', lang)}</p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="text-center">
+            <div class="w-10 h-10 mx-auto mb-4 rounded-full bg-atlas-accent/10 flex items-center justify-center text-atlas-accent font-bold">
+              2
+            </div>
+            <h3 class="text-lg font-semibold text-atlas-text-bright mb-2" data-i18n="howItWorks.step2.title">{t('howItWorks.step2.title', lang)}</h3>
+            <p class="text-sm text-atlas-muted" data-i18n="howItWorks.step2.desc">{t('howItWorks.step2.desc', lang)}</p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="text-center">
+            <div class="w-10 h-10 mx-auto mb-4 rounded-full bg-atlas-accent/10 flex items-center justify-center text-atlas-accent font-bold">
+              3
+            </div>
+            <h3 class="text-lg font-semibold text-atlas-text-bright mb-2" data-i18n="howItWorks.step3.title">{t('howItWorks.step3.title', lang)}</h3>
+            <p class="text-sm text-atlas-muted" data-i18n="howItWorks.step3.desc">{t('howItWorks.step3.desc', lang)}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Strip -->
+    <section class="py-24 border-t border-atlas-border">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+        <a href={`${base}learn/01-what-is-programming/`} class="atlas-btn-primary text-lg">
+          <span data-i18n="hero.cta2">{t('hero.cta2', lang)}</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <Footer lang={lang} />
+</Layout>
+
+<style>
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); opacity: 0.1; }
+    50% { transform: translateY(-10px); opacity: 0.2; }
+  }
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+</style>

@@ -1,0 +1,43 @@
+---
+import Layout from '../components/layout/Layout.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import ConceptFilter from '../components/ConceptFilter';
+import { getCollection } from 'astro:content';
+import { t, getLangFromUrl } from '../i18n/utils';
+import type { Lang } from '../i18n/utils';
+
+const lang: Lang = getLangFromUrl(Astro.url);
+const concepts = await getCollection('concepts');
+
+const conceptData = concepts.map((c) => ({
+  slug: c.slug,
+  title: c.data.title,
+  titleEs: c.data.titleEs,
+  description: c.data.description,
+  descriptionEs: c.data.descriptionEs,
+  level: c.data.level,
+  estimatedMinutes: c.data.estimatedMinutes,
+  order: c.data.order,
+}));
+---
+<Layout title={`${t('map.title', lang)} — CodeAtlas`} lang={lang}>
+  <Header lang={lang} />
+
+  <main class="flex-1 py-24">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-16">
+        <h1 class="text-4xl font-bold text-atlas-text-bright mb-4" data-i18n="map.title">
+          {t('map.title', lang)}
+        </h1>
+        <p class="text-lg text-atlas-muted max-w-2xl mx-auto" data-i18n="map.subtitle">
+          {t('map.subtitle', lang)}
+        </p>
+      </div>
+
+      <ConceptFilter client:load concepts={conceptData} lang={lang} />
+    </div>
+  </main>
+
+  <Footer lang={lang} />
+</Layout>

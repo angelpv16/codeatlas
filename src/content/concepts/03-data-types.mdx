@@ -1,0 +1,147 @@
+---
+title: "Data Types"
+titleEs: "Tipos de datos"
+description: "Understand Python's four basic data types: strings, integers, floats, and booleans."
+descriptionEs: "Comprende los cuatro tipos de datos básicos de Python: cadenas, enteros, flotantes y booleanos."
+order: 3
+level: "beginner"
+estimatedMinutes: 12
+tags: ["python", "data-types", "basics"]
+relatedConcepts: ["02-variables", "04-operators"]
+hasAnimation: false
+publishedAt: 2025-01-15
+---
+
+## Why Types Matter
+
+In Python, every value has a **type**. The type tells Python what kind of data it's dealing with and what operations make sense for it. You can add two numbers, but can you add a number and a word? That depends on the types.
+
+Think of it this way: you wouldn't try to multiply the word "hello" by the color blue. Types give Python the same common sense.
+
+## The Four Basic Types
+
+### 1. Strings (`str`) — Text
+
+A string is any text wrapped in quotes:
+
+```python
+greeting = "Hello, world!"
+name = 'Alex'
+empty = ""
+```
+
+You can use double quotes `"..."` or single quotes `'...'` — Python treats them the same. Strings can contain letters, numbers, spaces, symbols — anything that's text.
+
+```python
+address = "123 Main Street"
+emoji = "🐍"
+```
+
+### 2. Integers (`int`) — Whole Numbers
+
+Integers are whole numbers — no decimal point:
+
+```python
+age = 25
+year = 2025
+negative = -10
+zero = 0
+```
+
+Python handles integers of any size. There's no limit:
+
+```python
+big_number = 999999999999999999999
+```
+
+### 3. Floats (`float`) — Decimal Numbers
+
+Floats are numbers with a decimal point:
+
+```python
+temperature = 22.5
+pi = 3.14159
+price = 9.99
+```
+
+Even `10.0` is a float, not an integer — the decimal point makes the difference.
+
+### 4. Booleans (`bool`) — True or False
+
+Booleans have only two possible values:
+
+```python
+is_active = True
+is_logged_in = False
+```
+
+Note the capitalization — `True` and `False` (not `true` or `false`). Booleans are essential for making decisions in your code.
+
+## Checking Types with `type()`
+
+Python has a built-in function to tell you what type a value is:
+
+```python
+print(type("Hello"))    # <class 'str'>
+print(type(42))         # <class 'int'>
+print(type(3.14))       # <class 'float'>
+print(type(True))       # <class 'bool'>
+```
+
+This is useful when debugging — if something isn't working, checking the type often reveals the problem.
+
+## Type Conversion
+
+Sometimes you need to convert between types:
+
+```python
+# String to integer
+age_text = "25"
+age_number = int(age_text)  # 25
+
+# Integer to string
+count = 42
+count_text = str(count)  # "42"
+
+# Integer to float
+whole = 10
+decimal = float(whole)  # 10.0
+
+# Float to integer (truncates, doesn't round)
+pi = 3.99
+rounded = int(pi)  # 3
+```
+
+## The Classic Mistake: Mixing Types
+
+This is one of the most common beginner errors:
+
+```python
+# ❌ This causes a TypeError
+result = "5" + 5
+```
+
+Python sees `"5"` (a string) and `5` (an integer) and doesn't know what you mean. Do you want `"55"` (concatenation) or `10` (addition)?
+
+The fix: explicitly convert one type to match the other.
+
+```python
+# If you want addition: convert the string to int
+result = int("5") + 5    # 10
+
+# If you want concatenation: convert the int to str
+result = "5" + str(5)    # "55"
+```
+
+## Quick Reference
+
+| Type | Example | Use Case |
+|------|---------|----------|
+| `str` | `"Hello"` | Text, names, messages |
+| `int` | `42` | Counting, indexing, whole numbers |
+| `float` | `3.14` | Measurements, prices, decimals |
+| `bool` | `True` | Conditions, flags, toggles |
+
+## What's Next?
+
+Now that you know the basic data types, it's time to learn how to **work with them** — using operators to do math, compare values, and more.

@@ -1,0 +1,95 @@
+---
+import Layout from '../components/layout/Layout.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import { t, getLangFromUrl } from '../i18n/utils';
+import type { Lang } from '../i18n/utils';
+
+const lang: Lang = getLangFromUrl(Astro.url);
+
+const phases = [
+  {
+    titleKey: 'roadmap.phase1.title',
+    descKey: 'roadmap.phase1.desc',
+    status: 'live' as const,
+    statusKey: 'roadmap.status.live',
+  },
+  {
+    titleKey: 'roadmap.phase2.title',
+    descKey: 'roadmap.phase2.desc',
+    status: 'inProgress' as const,
+    statusKey: 'roadmap.status.inProgress',
+  },
+  {
+    titleKey: 'roadmap.phase3.title',
+    descKey: 'roadmap.phase3.desc',
+    status: 'planned' as const,
+    statusKey: 'roadmap.status.planned',
+  },
+  {
+    titleKey: 'roadmap.phase4.title',
+    descKey: 'roadmap.phase4.desc',
+    status: 'planned' as const,
+    statusKey: 'roadmap.status.planned',
+  },
+];
+
+const statusStyles = {
+  live: 'bg-green-500/10 text-green-400 border-green-500/30',
+  inProgress: 'bg-atlas-accent/10 text-atlas-accent border-atlas-accent/30',
+  planned: 'bg-atlas-muted/10 text-atlas-muted border-atlas-muted/30',
+};
+
+const dotStyles = {
+  live: 'bg-green-400',
+  inProgress: 'bg-atlas-accent',
+  planned: 'bg-atlas-muted',
+};
+---
+<Layout title={`${t('roadmap.title', lang)} — CodeAtlas`} lang={lang}>
+  <Header lang={lang} />
+
+  <main class="flex-1 py-24">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-16">
+        <h1 class="text-4xl font-bold text-atlas-text-bright mb-4" data-i18n="roadmap.title">
+          {t('roadmap.title', lang)}
+        </h1>
+        <p class="text-lg text-atlas-muted max-w-2xl mx-auto" data-i18n="roadmap.subtitle">
+          {t('roadmap.subtitle', lang)}
+        </p>
+      </div>
+
+      <!-- Timeline -->
+      <div class="relative">
+        <!-- Vertical line -->
+        <div class="absolute left-6 top-0 bottom-0 w-px bg-atlas-border"></div>
+
+        <div class="space-y-8">
+          {phases.map((phase) => (
+            <div class="relative pl-16">
+              <!-- Timeline dot -->
+              <div class={`absolute left-4 top-6 w-4 h-4 rounded-full ${dotStyles[phase.status]} ring-4 ring-atlas-bg`}></div>
+
+              <div class="atlas-card">
+                <div class="flex items-start justify-between gap-4 mb-3">
+                  <h2 class="text-xl font-semibold text-atlas-text-bright" data-i18n={phase.titleKey}>
+                    {t(phase.titleKey, lang)}
+                  </h2>
+                  <span class={`atlas-badge border ${statusStyles[phase.status]} shrink-0`} data-i18n={phase.statusKey}>
+                    {t(phase.statusKey, lang)}
+                  </span>
+                </div>
+                <p class="text-atlas-muted leading-relaxed" data-i18n={phase.descKey}>
+                  {t(phase.descKey, lang)}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer lang={lang} />
+</Layout>

@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('https://fonts.gstatic.com/s/jetbrainsmono/v18/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKxTOlOTk6OThhvA.woff2') format('woff2');
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-atlas-bg text-atlas-text font-sans antialiased;
+  }
+
+  ::selection {
+    @apply bg-atlas-accent/30 text-atlas-text-bright;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-atlas-bg;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-atlas-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-atlas-muted;
+  }
+}
+
+@layer components {
+  .atlas-card {
+    @apply bg-atlas-surface border border-atlas-border rounded-xl p-6
+           transition-all duration-300 ease-out;
+  }
+
+  .atlas-card:hover {
+    @apply -translate-y-0.5 border-atlas-accent/40;
+  }
+
+  .atlas-glow {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+  }
+
+  .atlas-btn-primary {
+    @apply inline-flex items-center gap-2 px-6 py-3 bg-atlas-accent
+           text-white font-medium rounded-lg transition-all duration-200
+           hover:bg-atlas-accent-hover hover:shadow-glow
+           focus:outline-none focus:ring-2 focus:ring-atlas-accent/50;
+  }
+
+  .atlas-btn-secondary {
+    @apply inline-flex items-center gap-2 px-6 py-3 border border-atlas-border
+           text-atlas-text font-medium rounded-lg transition-all duration-200
+           hover:border-atlas-accent/40 hover:text-atlas-text-bright
+           focus:outline-none focus:ring-2 focus:ring-atlas-accent/50;
+  }
+
+  .atlas-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .atlas-badge-beginner {
+    @apply atlas-badge bg-atlas-secondary/10 text-atlas-secondary;
+  }
+
+  .atlas-badge-intermediate {
+    @apply atlas-badge bg-atlas-accent/10 text-atlas-accent;
+  }
+
+  .atlas-badge-advanced {
+    @apply atlas-badge bg-purple-500/10 text-purple-400;
+  }
+}
+
+/* Prose overrides for dark theme */
+@layer utilities {
+  .prose-atlas {
+    --tw-prose-body: theme('colors.atlas.text');
+    --tw-prose-headings: theme('colors.atlas.text-bright');
+    --tw-prose-lead: theme('colors.atlas.muted');
+    --tw-prose-links: theme('colors.atlas.accent');
+    --tw-prose-bold: theme('colors.atlas.text-bright');
+    --tw-prose-counters: theme('colors.atlas.muted');
+    --tw-prose-bullets: theme('colors.atlas.border');
+    --tw-prose-hr: theme('colors.atlas.border');
+    --tw-prose-quotes: theme('colors.atlas.text');
+    --tw-prose-quote-borders: theme('colors.atlas.accent');
+    --tw-prose-captions: theme('colors.atlas.muted');
+    --tw-prose-code: theme('colors.atlas.secondary');
+    --tw-prose-pre-code: theme('colors.atlas.text');
+    --tw-prose-pre-bg: theme('colors.atlas.code');
+    --tw-prose-th-borders: theme('colors.atlas.border');
+    --tw-prose-td-borders: theme('colors.atlas.border');
+  }
+}

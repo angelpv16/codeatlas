@@ -1,0 +1,144 @@
+---
+import Layout from '../../components/layout/Layout.astro';
+import Header from '../../components/layout/Header.astro';
+import Footer from '../../components/layout/Footer.astro';
+import MiniQuiz from '../../components/MiniQuiz';
+import { getCollection } from 'astro:content';
+import { t, getLangFromUrl } from '../../i18n/utils';
+import type { Lang } from '../../i18n/utils';
+
+export async function getStaticPaths() {
+  const concepts = await getCollection('concepts');
+  return concepts.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const lang: Lang = getLangFromUrl(Astro.url);
+const base = import.meta.env.BASE_URL;
+
+const concepts = await getCollection('concepts');
+const sorted = concepts.sort((a, b) => a.data.order - b.data.order);
+const currentIndex = sorted.findIndex((c) => c.slug === entry.slug);
+const prevConcept = currentIndex > 0 ? sorted[currentIndex - 1] : null;
+const nextConcept = currentIndex < sorted.length - 1 ? sorted[currentIndex + 1] : null;
+
+const displayTitle = lang === 'es' ? entry.data.titleEs : entry.data.title;
+const displayDesc = lang === 'es' ? entry.data.descriptionEs : entry.data.description;
+const levelLabel = t(`concepts.${entry.data.level}`, lang);
+const readTime = t('concepts.readTime', lang);
+
+const badgeClass = {
+  beginner: 'atlas-badge-beginner',
+  intermediate: 'atlas-badge-intermediate',
+  advanced: 'atlas-badge-advanced',
+}[entry.data.level];
+
+// Quiz data per concept
+const quizzes: Record<string, { question: string; questionEs: string; options: string[]; optionsEs: string[]; correctIndex: number }> = {
+  '01-what-is-programming': {
+    question: 'What does the print() function do in Python?',
+    questionEs: '¿Qué hace la función print() en Python?',
+    options: ['Creates a variable', 'Displays output on screen', 'Reads user input', 'Saves a file'],
+    optionsEs: ['Crea una variable', 'Muestra texto en pantalla', 'Lee entrada del usuario', 'Guarda un archivo'],
+    correctIndex: 1,
+  },
+  '02-variables': {
+    question: 'What is the difference between = and == in Python?',
+    questionEs: '¿Cuál es la diferencia entre = y == en Python?',
+    options: ['They are the same thing', '= assigns a value, == compares values', '= compares values, == assigns a value', '== is used for strings only'],
+    optionsEs: ['Son lo mismo', '= asigna un valor, == compara valores', '= compara valores, == asigna un valor', '== solo se usa para cadenas'],
+    correctIndex: 1,
+  },
+  '03-data-types': {
+    question: 'What happens when you run: "5" + 5 in Python?',
+    questionEs: '¿Qué pasa cuando ejecutas: "5" + 5 en Python?',
+    options: ['Returns 10', 'Returns "55"', 'Raises a TypeError', 'Returns "5 5"'],
+    optionsEs: ['Devuelve 10', 'Devuelve "55"', 'Lanza un TypeError', 'Devuelve "5 5"'],
+    correctIndex: 2,
+  },
+  '04-operators': {
+    question: 'What does 10 / 2 return in Python?',
+    questionEs: '¿Qué devuelve 10 / 2 en Python?',
+    options: ['5', '5.0', '2', 'Error'],
+    optionsEs: ['5', '5.0', '2', 'Error'],
+    correctIndex: 1,
+  },
+};
+
+const quiz = quizzes[entry.slug];
+---
+<Layout title={`${displayTitle} — CodeAtlas`} description={displayDesc} lang={lang}>
+  <Header lang={lang} />
+
+  <main class="flex-1 py-12 sm:py-24">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6">
+      <!-- Back to map -->
+      <a href={`${base}map/`} class="inline-flex items-center gap-2 text-sm text-atlas-muted hover:text-atlas-accent transition-colors mb-8">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span data-i18n="learn.backToMap">{t('learn.backToMap', lang)}</span>
+      </a>
+
+      <!-- Article header -->
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-4">
+          <span class={badgeClass}>{levelLabel}</span>
+          <span class="text-sm text-atlas-muted">{entry.data.estimatedMinutes} {readTime}</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold text-atlas-text-bright mb-4">
+          {displayTitle}
+        </h1>
+        <p class="text-lg text-atlas-muted">
+          {displayDesc}
+        </p>
+      </header>
+
+      <!-- MDX Content -->
+      <article class="prose prose-lg prose-atlas max-w-none">
+        <Content />
+      </article>
+
+      <!-- Quiz -->
+      {quiz && (
+        <section class="mt-16 pt-8 border-t border-atlas-border">
+          <MiniQuiz
+            client:load
+            question={lang === 'es' ? quiz.questionEs : quiz.question}
+            options={lang === 'es' ? quiz.optionsEs : quiz.options}
+            correctIndex={quiz.correctIndex}
+            lang={lang}
+            nextSlug={nextConcept?.slug}
+          />
+        </section>
+      )}
+
+      <!-- Navigation -->
+      <nav class="mt-16 pt-8 border-t border-atlas-border flex items-center justify-between">
+        {prevConcept ? (
+          <a href={`${base}learn/${prevConcept.slug}/`} class="atlas-btn-secondary text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span data-i18n="learn.prevConcept">{t('learn.prevConcept', lang)}</span>
+          </a>
+        ) : <div />}
+
+        {nextConcept ? (
+          <a href={`${base}learn/${nextConcept.slug}/`} class="atlas-btn-primary text-sm">
+            <span data-i18n="learn.nextConcept">{t('learn.nextConcept', lang)}</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        ) : <div />}
+      </nav>
+    </div>
+  </main>
+
+  <Footer lang={lang} />
+</Layout>

@@ -1,0 +1,175 @@
+---
+title: "Operators"
+titleEs: "Operadores"
+description: "Master Python's arithmetic and comparison operators with practical examples."
+descriptionEs: "Domina los operadores aritméticos y de comparación de Python con ejemplos prácticos."
+order: 4
+level: "beginner"
+estimatedMinutes: 10
+tags: ["python", "operators", "basics"]
+relatedConcepts: ["02-variables", "03-data-types"]
+hasAnimation: false
+publishedAt: 2025-01-15
+---
+
+## What Are Operators?
+
+Operators are symbols that tell Python to perform a specific operation. You've already seen one: `=` for assignment. Now let's explore the operators that let you do math and make comparisons.
+
+## Arithmetic Operators
+
+These work like the math you already know:
+
+```python
+a = 10
+b = 3
+
+print(a + b)   # 13  — Addition
+print(a - b)   # 7   — Subtraction
+print(a * b)   # 30  — Multiplication
+print(a / b)   # 3.3333...  — Division
+print(a // b)  # 3   — Floor division (rounds down)
+print(a % b)   # 1   — Modulo (remainder)
+print(a ** b)  # 1000 — Exponentiation (10³)
+```
+
+### The Division Duo: `/` vs `//`
+
+This is where beginners often get tripped up:
+
+```python
+# Regular division — always returns a float
+10 / 3    # 3.3333...
+10 / 2    # 5.0  (still a float!)
+
+# Floor division — rounds DOWN to the nearest integer
+10 // 3   # 3
+7 // 2    # 3
+-7 // 2   # -4  (rounds toward negative infinity)
+```
+
+**Key insight:** Regular division `/` always returns a float, even when dividing evenly. Floor division `//` always rounds down.
+
+### The Modulo Operator: `%`
+
+Modulo gives you the **remainder** after division:
+
+```python
+10 % 3   # 1  (10 ÷ 3 = 3 remainder 1)
+15 % 5   # 0  (15 ÷ 5 = 3 remainder 0)
+7 % 2    # 1  (7 ÷ 2 = 3 remainder 1)
+```
+
+A common use: checking if a number is even or odd:
+
+```python
+number = 42
+if number % 2 == 0:
+    print("Even")
+else:
+    print("Odd")
+```
+
+### Exponentiation: `**`
+
+The double asterisk raises a number to a power:
+
+```python
+2 ** 3    # 8   (2³ = 2 × 2 × 2)
+5 ** 2    # 25  (5² = 5 × 5)
+9 ** 0.5  # 3.0 (square root of 9)
+```
+
+## Comparison Operators
+
+Comparison operators ask a question and return `True` or `False`:
+
+```python
+x = 10
+y = 5
+
+print(x == y)   # False — Equal to?
+print(x != y)   # True  — Not equal to?
+print(x > y)    # True  — Greater than?
+print(x < y)    # False — Less than?
+print(x >= y)   # True  — Greater than or equal to?
+print(x <= y)   # False — Less than or equal to?
+```
+
+### Comparing Different Types
+
+You can compare numbers of different types:
+
+```python
+10 == 10.0   # True  — int and float comparison works
+10 > 5.5     # True
+```
+
+But comparing strings with numbers doesn't work the way you might expect:
+
+```python
+"10" == 10   # False — different types!
+```
+
+## Operator Precedence
+
+Just like in math, Python follows an order of operations:
+
+```python
+result = 2 + 3 * 4    # 14 (not 20)
+result = (2 + 3) * 4  # 20 (parentheses override)
+```
+
+The order (highest to lowest):
+1. `**` — Exponentiation
+2. `*`, `/`, `//`, `%` — Multiplication, division
+3. `+`, `-` — Addition, subtraction
+4. `==`, `!=`, `>`, `<`, `>=`, `<=` — Comparisons
+
+When in doubt, use parentheses to make your intent clear.
+
+## Practical Example
+
+Let's combine what we've learned:
+
+```python
+# Calculate the total cost with tax
+price = 29.99
+quantity = 3
+tax_rate = 0.08
+
+subtotal = price * quantity
+tax = subtotal * tax_rate
+total = subtotal + tax
+
+print("Subtotal: $" + str(round(subtotal, 2)))
+print("Tax: $" + str(round(tax, 2)))
+print("Total: $" + str(round(total, 2)))
+```
+
+Output:
+```
+Subtotal: $89.97
+Tax: $7.2
+Total: $97.17
+```
+
+## Common Mistake: Integer vs Float Division
+
+```python
+# ❌ Unexpected result if you wanted a whole number
+result = 10 / 2
+print(result)       # 5.0 (not 5!)
+print(type(result)) # <class 'float'>
+
+# ✅ Use floor division if you want an integer
+result = 10 // 2
+print(result)       # 5
+print(type(result)) # <class 'int'>
+```
+
+Remember: `/` always gives a float. Use `//` when you need an integer result.
+
+## What's Next?
+
+With variables, data types, and operators under your belt, you have the building blocks of programming. Next up: **control flow** — making your programs make decisions and repeat actions.

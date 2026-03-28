@@ -1,0 +1,55 @@
+---
+interface Props {
+  code: string;
+  lang?: string;
+  filename?: string;
+}
+
+const { code, lang = 'python', filename } = Astro.props;
+---
+<div class="relative group rounded-lg overflow-hidden border border-atlas-border my-6">
+  {filename && (
+    <div class="flex items-center gap-2 px-4 py-2 bg-atlas-code border-b border-atlas-border">
+      <svg class="w-4 h-4 text-atlas-muted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+      </svg>
+      <span class="text-xs text-atlas-muted font-mono">{filename}</span>
+    </div>
+  )}
+  <div class="relative">
+    <pre class="!bg-atlas-code !m-0 !rounded-none p-4 overflow-x-auto text-sm leading-relaxed"><code class={`language-${lang}`}>{code}</code></pre>
+    <button
+      class="copy-btn absolute top-3 right-3 p-2 rounded-md bg-atlas-surface border border-atlas-border
+             text-atlas-muted hover:text-atlas-text-bright hover:border-atlas-accent/40
+             opacity-0 group-hover:opacity-100 transition-all"
+      data-code={code}
+      aria-label="Copy code"
+    >
+      <svg class="w-4 h-4 copy-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+      </svg>
+      <svg class="w-4 h-4 check-icon hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script is:inline>
+  document.querySelectorAll('.copy-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var code = this.getAttribute('data-code');
+      var copyIcon = this.querySelector('.copy-icon');
+      var checkIcon = this.querySelector('.check-icon');
+      navigator.clipboard.writeText(code).then(function() {
+        copyIcon.classList.add('hidden');
+        checkIcon.classList.remove('hidden');
+        setTimeout(function() {
+          copyIcon.classList.remove('hidden');
+          checkIcon.classList.add('hidden');
+        }, 2000);
+      });
+    });
+  });
+</script>

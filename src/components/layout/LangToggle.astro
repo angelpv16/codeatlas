@@ -1,0 +1,59 @@
+---
+import type { Lang } from '../../i18n/utils';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+---
+<div class="flex items-center rounded-full border border-atlas-border bg-atlas-surface overflow-hidden text-xs font-medium">
+  <button
+    data-lang-btn="en"
+    class:list={[
+      'px-3 py-1.5 transition-colors',
+      lang === 'en' ? 'bg-atlas-accent text-white' : 'text-atlas-muted hover:text-atlas-text-bright',
+    ]}
+  >
+    EN
+  </button>
+  <button
+    data-lang-btn="es"
+    class:list={[
+      'px-3 py-1.5 transition-colors',
+      lang === 'es' ? 'bg-atlas-accent text-white' : 'text-atlas-muted hover:text-atlas-text-bright',
+    ]}
+  >
+    ES
+  </button>
+</div>
+
+<script is:inline>
+  (function() {
+    const enBtn = document.querySelector('[data-lang-btn="en"]');
+    const esBtn = document.querySelector('[data-lang-btn="es"]');
+    const currentLang = localStorage.getItem('codeatlas-lang') || 'en';
+
+    function updateButtons(lang) {
+      if (enBtn && esBtn) {
+        enBtn.className = 'px-3 py-1.5 transition-colors ' +
+          (lang === 'en' ? 'bg-atlas-accent text-white' : 'text-atlas-muted hover:text-atlas-text-bright');
+        esBtn.className = 'px-3 py-1.5 transition-colors ' +
+          (lang === 'es' ? 'bg-atlas-accent text-white' : 'text-atlas-muted hover:text-atlas-text-bright');
+      }
+    }
+
+    updateButtons(currentLang);
+
+    function switchLang(lang) {
+      localStorage.setItem('codeatlas-lang', lang);
+      // Reload to apply language change
+      const url = new URL(window.location.href);
+      url.searchParams.set('lang', lang);
+      window.location.href = url.toString();
+    }
+
+    enBtn?.addEventListener('click', () => switchLang('en'));
+    esBtn?.addEventListener('click', () => switchLang('es'));
+  })();
+</script>
