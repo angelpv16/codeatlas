@@ -4,7 +4,7 @@ import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
 
 export default defineConfig({
-  site: 'https://YOUR_USERNAME.github.io',
+  site: 'https://angelpv16.github.io',
   base: '/codeatlas',
   integrations: [
     tailwind(),
