@@ -7,6 +7,7 @@ interface Concept {
   description: string;
   descriptionEs: string;
   level: 'beginner' | 'intermediate' | 'advanced';
+  section: 'fundamentals' | 'dsa';
   estimatedMinutes: number;
   order: number;
 }
@@ -27,34 +28,68 @@ const levelLabels = {
   es: { all: 'Todos', beginner: 'Principiante', intermediate: 'Intermedio', advanced: 'Avanzado' },
 };
 
+const sectionLabels = {
+  en: { all: 'All', fundamentals: 'Fundamentals', dsa: 'DSA' },
+  es: { all: 'Todo', fundamentals: 'Fundamentos', dsa: 'DSA' },
+};
+
 export default function ConceptFilter({ concepts, lang = 'en' }: ConceptFilterProps) {
-  const [filter, setFilter] = useState<string>('all');
+  const [levelFilter, setLevelFilter] = useState<string>('all');
+  const [sectionFilter, setSectionFilter] = useState<string>('all');
   const labels = levelLabels[lang];
+  const secLabels = sectionLabels[lang];
   const base = import.meta.env.BASE_URL ?? '/codeatlas/';
 
-  const filtered = filter === 'all' ? concepts : concepts.filter((c) => c.level === filter);
+  const filtered = concepts.filter((c) => {
+    const matchLevel = levelFilter === 'all' || c.level === levelFilter;
+    const matchSection = sectionFilter === 'all' || c.section === sectionFilter;
+    return matchLevel && matchSection;
+  });
+
   const readTimeLabel = lang === 'es' ? 'min de lectura' : 'min read';
 
-  const filters = [
+  const levelFilters = [
     { key: 'all', label: labels.all },
     { key: 'beginner', label: labels.beginner },
     { key: 'intermediate', label: labels.intermediate },
     { key: 'advanced', label: labels.advanced },
   ];
 
+  const sectionFilters = [
+    { key: 'all', label: secLabels.all },
+    { key: 'fundamentals', label: secLabels.fundamentals },
+    { key: 'dsa', label: secLabels.dsa },
+  ];
+
+  const btnClass = (active: boolean) =>
+    `px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+      active
+        ? 'bg-atlas-accent text-white'
+        : 'bg-atlas-surface border border-atlas-border text-atlas-muted hover:border-atlas-accent/40 hover:text-atlas-text-bright'
+    }`;
+
   return (
     <div>
-      {/* Filter buttons */}
-      <div className="flex flex-wrap gap-2 mb-8">
-        {filters.map((f) => (
+      {/* Section filter */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {sectionFilters.map((f) => (
           <button
             key={f.key}
-            onClick={() => setFilter(f.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              filter === f.key
-                ? 'bg-atlas-accent text-white'
-                : 'bg-atlas-surface border border-atlas-border text-atlas-muted hover:border-atlas-accent/40 hover:text-atlas-text-bright'
-            }`}
+            onClick={() => setSectionFilter(f.key)}
+            className={btnClass(sectionFilter === f.key)}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Level filter */}
+      <div className="flex flex-wrap gap-2 mb-8">
+        {levelFilters.map((f) => (
+          <button
+            key={f.key}
+            onClick={() => setLevelFilter(f.key)}
+            className={btnClass(levelFilter === f.key)}
           >
             {f.label}
           </button>

@@ -8,6 +8,7 @@ const conceptsCollection = defineCollection({
     description: z.string(),
     descriptionEs: z.string(),
     order: z.number(),
+    section: z.enum(['fundamentals', 'dsa']).default('fundamentals'),
     level: z.enum(['beginner', 'intermediate', 'advanced']),
     estimatedMinutes: z.number(),
     tags: z.array(z.string()),

@@ -1,0 +1,111 @@
+---
+title: "Hash Tables"
+titleEs: "Tablas Hash"
+description: "Discover how hash tables power Python dictionaries with near-instant lookups, inserts, and deletes."
+descriptionEs: "Descubre cómo las tablas hash potencian los diccionarios de Python con búsquedas, inserciones y eliminaciones casi instantáneas."
+order: 8
+section: "dsa"
+level: "intermediate"
+estimatedMinutes: 10
+tags: ["dsa", "hash-table", "dictionary", "hashing", "data-structures"]
+relatedConcepts: ["05-arrays-and-lists", "03-data-types"]
+hasAnimation: false
+publishedAt: 2025-06-01
+---
+
+## What Is a Hash Table?
+
+A **hash table** is a data structure that maps **keys** to **values** using a hash function. In Python, dictionaries **are** hash tables. This is why looking up a value by its key is nearly instant, no matter how large the dictionary is.
+
+## How It Works (Conceptually)
+
+1. You give it a key (e.g. `"name"`)
+2. A **hash function** converts the key into a number (an index)
+3. That index points to where the value is stored in memory
+4. This is why lookup is **O(1)** — nearly instant regardless of size
+
+Think of it like a library catalog. Instead of searching every shelf for a book, you look up the catalog code and go directly to the right shelf.
+
+## Python Dictionaries as Hash Tables
+
+```python
+# Creating
+user = {"name": "Alex", "age": 25, "city": "Madrid"}
+
+# Accessing — O(1)
+print(user["name"])        # "Alex"
+
+# Adding / updating
+user["email"] = "alex@example.com"
+user["age"] = 26
+
+# Removing
+del user["city"]
+
+# Checking existence — O(1)
+print("name" in user)      # True
+
+# Iterating
+for key, value in user.items():
+    print(f"{key}: {value}")
+```
+
+Every operation above — access, insert, delete, check existence — runs in **O(1) average time**.
+
+## Real-World Use Cases
+
+- **Caching (memoization)** — store computed results to avoid recalculating
+- **Counting frequencies** — count how often each word appears in a text
+- **Fast lookups** — user records, config settings, routing tables
+- **Deduplication** — quickly check if you've seen a value before
+
+## Practical Example: Word Frequency Counter
+
+```python
+text = "the cat sat on the mat the cat"
+words = text.split()
+frequency = {}
+
+for word in words:
+    frequency[word] = frequency.get(word, 0) + 1
+
+print(frequency)
+# {'the': 3, 'cat': 2, 'sat': 1, 'on': 1, 'mat': 1}
+```
+
+The `.get(word, 0)` method returns the current count if the key exists, or `0` if it doesn't. This is a clean pattern to avoid `KeyError`.
+
+## Hash Collisions
+
+Sometimes two different keys produce the **same hash** (the same index). This is called a **collision**. Python handles collisions internally using a technique called open addressing — you don't need to implement anything manually.
+
+In practice, Python's hash function is well-designed enough that collisions are rare and don't noticeably affect performance.
+
+## Common Mistake: Unhashable Keys
+
+Dictionary keys must be **hashable** — meaning they must be immutable. Lists are mutable, so they can't be keys:
+
+```python
+# ❌ TypeError: unhashable type: 'list'
+d = {[1, 2]: "value"}
+
+# ✅ Tuples are immutable, so they work
+d = {(1, 2): "value"}
+```
+
+Valid key types: strings, numbers, tuples, booleans. Invalid: lists, dictionaries, sets.
+
+## Time Complexity Summary
+
+| Operation | Average | Worst Case |
+|---|---|---|
+| Lookup | O(1) | O(n) |
+| Insert | O(1) | O(n) |
+| Delete | O(1) | O(n) |
+| Check existence | O(1) | O(n) |
+
+The worst case (O(n)) only happens when many keys collide — rare in practice with Python's implementation.
+
+## What's Next?
+
+Hash tables are one of the most important data structures in all of programming. Combined with arrays, stacks, queues, and linked lists, you now have a solid foundation in data structures. Each one has its strengths — the key is knowing **when** to use which.

@@ -1,0 +1,153 @@
+---
+title: "Arrays and Lists"
+titleEs: "Arrays y Listas"
+description: "Learn how arrays and lists store ordered collections of data, and master the essential operations every programmer needs."
+descriptionEs: "Aprende cómo los arrays y listas almacenan colecciones ordenadas de datos, y domina las operaciones esenciales que todo programador necesita."
+order: 5
+section: "dsa"
+level: "beginner"
+estimatedMinutes: 8
+tags: ["dsa", "arrays", "lists", "data-structures"]
+relatedConcepts: ["06-stacks-and-queues", "08-hash-tables"]
+hasAnimation: true
+publishedAt: 2025-06-01
+---
+
+## What Is a List?
+
+A **list** is a container that holds multiple values in a specific order. Each value has a position — called an **index** — starting from 0. In Python, lists are the native equivalent of arrays found in other languages.
+
+Think of it like a row of numbered boxes. Each box holds a value. You can access any box instantly by its number.
+
+<div class="atlas-animation">
+  <div class="array-visual">
+    <div class="array-box" style="--i:0"><span class="array-index">0</span><span class="array-value">"apple"</span></div>
+    <div class="array-box" style="--i:1"><span class="array-index">1</span><span class="array-value">"banana"</span></div>
+    <div class="array-box" style="--i:2"><span class="array-index">2</span><span class="array-value">"cherry"</span></div>
+    <div class="array-box array-box--highlight" style="--i:3"><span class="array-index">3</span><span class="array-value">"mango"</span></div>
+  </div>
+</div>
+
+<style>{`
+  .array-visual {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    padding: 2rem 0;
+  }
+  .array-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #1e2330;
+    border: 1px solid #2a3040;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    opacity: 0;
+    animation: fadeSlideIn 0.4s ease forwards;
+    animation-delay: calc(var(--i) * 0.15s);
+  }
+  .array-box--highlight {
+    border-color: #6366f1;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+  }
+  .array-index {
+    font-size: 0.7rem;
+    color: #6366f1;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 0.25rem;
+  }
+  .array-value {
+    font-family: 'JetBrains Mono', monospace;
+    color: #22d3ee;
+    font-size: 0.85rem;
+  }
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+`}</style>
+
+## Creating and Using Lists
+
+```python
+fruits = ["apple", "banana", "cherry"]
+print(fruits[0])   # "apple"
+print(fruits[-1])  # "cherry" (negative indexing)
+
+fruits.append("mango")
+fruits.remove("banana")
+print(len(fruits)) # 3
+```
+
+Negative indexing lets you count from the end: `-1` is the last item, `-2` is the second to last, and so on.
+
+## Key Operations
+
+### Access by Index
+
+```python
+colors = ["red", "green", "blue", "yellow"]
+print(colors[2])   # "blue"
+```
+
+### Slicing
+
+```python
+numbers = [10, 20, 30, 40, 50]
+print(numbers[1:3])   # [20, 30]
+print(numbers[:2])    # [10, 20]
+print(numbers[3:])    # [40, 50]
+```
+
+### Iterating
+
+```python
+fruits = ["apple", "banana", "cherry"]
+for fruit in fruits:
+    print(fruit)
+```
+
+### Append and Remove
+
+```python
+stack = [1, 2, 3]
+stack.append(4)       # [1, 2, 3, 4]
+stack.remove(2)       # [1, 3, 4]
+```
+
+## Time Complexity
+
+Not all operations on a list are equally fast:
+
+| Operation | Speed | Big O |
+|---|---|---|
+| Access by index | Instant | O(1) |
+| Append to end | Fast | O(1) |
+| Search by value | Slow for large lists | O(n) |
+| Insert at start | Slow | O(n) |
+
+**O(1)** means the time doesn't change regardless of list size. **O(n)** means it gets slower as the list grows.
+
+## Common Mistake: IndexError
+
+Trying to access an index that doesn't exist crashes your program:
+
+```python
+colors = ["red", "green", "blue"]
+print(colors[5])  # IndexError: list index out of range
+```
+
+**Fix:** Always check the length first, or use negative indexing safely:
+
+```python
+colors = ["red", "green", "blue"]
+if len(colors) > 5:
+    print(colors[5])
+else:
+    print("Index out of range!")
+```
+
+## What's Next?
+
+Lists are the foundation for more specialized data structures. Next up: **Stacks and Queues** — two structures that restrict how you add and remove items, making them perfect for specific problems.

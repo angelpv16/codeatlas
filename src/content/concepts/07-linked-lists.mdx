@@ -1,0 +1,181 @@
+---
+title: "Linked Lists"
+titleEs: "Listas Enlazadas"
+description: "Understand how linked lists connect nodes with pointers, and when to choose them over regular lists."
+descriptionEs: "Comprende cómo las listas enlazadas conectan nodos con punteros, y cuándo elegirlas sobre listas regulares."
+order: 7
+section: "dsa"
+level: "intermediate"
+estimatedMinutes: 10
+tags: ["dsa", "linked-list", "nodes", "pointers", "data-structures"]
+relatedConcepts: ["05-arrays-and-lists", "06-stacks-and-queues"]
+hasAnimation: true
+publishedAt: 2025-06-01
+---
+
+## What Is a Linked List?
+
+A **linked list** is a sequence of nodes where each node holds a value AND a pointer (reference) to the next node. Unlike Python lists, the elements are not stored side by side in memory — each node can be anywhere, connected only by its pointer.
+
+### The Treasure Hunt Analogy
+
+Think of a treasure hunt. Each clue tells you where the **next** clue is. You can't jump directly to clue 5 — you have to follow clues 1, 2, 3, 4 first. That's exactly how traversing a linked list works.
+
+<div class="atlas-animation">
+  <div class="ll-visual">
+    <div class="ll-node" style="--i:0">
+      <span class="ll-val">1</span>
+      <span class="ll-ptr">next &#8594;</span>
+    </div>
+    <div class="ll-node" style="--i:1">
+      <span class="ll-val">2</span>
+      <span class="ll-ptr">next &#8594;</span>
+    </div>
+    <div class="ll-node ll-node--insert" style="--i:2">
+      <span class="ll-val">5</span>
+      <span class="ll-ptr">next &#8594;</span>
+    </div>
+    <div class="ll-node" style="--i:3">
+      <span class="ll-val">3</span>
+      <span class="ll-ptr">None</span>
+    </div>
+  </div>
+  <div class="ll-caption">Node inserted in the middle</div>
+</div>
+
+<style>{`
+  .ll-visual {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 0 0.5rem;
+    flex-wrap: wrap;
+  }
+  .ll-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #1e2330;
+    border: 1px solid #2a3040;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    opacity: 0;
+    animation: fadeSlideIn 0.4s ease forwards;
+    animation-delay: calc(var(--i) * 0.2s);
+  }
+  .ll-node--insert {
+    border-color: #22d3ee;
+    box-shadow: 0 0 12px rgba(34, 211, 238, 0.25);
+  }
+  .ll-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    color: #e2e8f0;
+    font-weight: 600;
+  }
+  .ll-ptr {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: #6366f1;
+    margin-top: 0.25rem;
+  }
+  .ll-caption {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #6366f1;
+    font-family: 'JetBrains Mono', monospace;
+    padding-bottom: 1rem;
+  }
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+`}</style>
+
+## Building a Linked List in Python
+
+Python doesn't have a built-in linked list, so we build one from scratch using classes:
+
+```python
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.next = None
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def append(self, value):
+        new_node = Node(value)
+        if not self.head:
+            self.head = new_node
+            return
+        current = self.head
+        while current.next:
+            current = current.next
+        current.next = new_node
+
+    def display(self):
+        elements = []
+        current = self.head
+        while current:
+            elements.append(current.value)
+            current = current.next
+        return elements
+
+ll = LinkedList()
+ll.append(1)
+ll.append(2)
+ll.append(3)
+print(ll.display())  # [1, 2, 3]
+```
+
+Each `Node` stores a `value` and a reference to the `next` node. The `LinkedList` keeps track of the `head` — the first node in the chain.
+
+## Singly vs Doubly Linked Lists
+
+- **Singly linked list** — each node points to the **next** node only. You can only traverse forward.
+- **Doubly linked list** — each node points to both the **next** and **previous** node. You can traverse in both directions, at the cost of extra memory.
+
+For most beginner use cases, singly linked lists are sufficient.
+
+## Python List vs Linked List
+
+| Operation | Python List | Linked List |
+|---|---|---|
+| Access by index | O(1) fast | O(n) slow |
+| Insert at start | O(n) slow | O(1) fast |
+| Insert at end | O(1) fast | O(n) slow* |
+| Memory | Contiguous | Scattered |
+
+\* Can be O(1) if you keep a reference to the tail node.
+
+## When to Use a Linked List
+
+Linked lists shine when you need:
+
+- **Frequent insertions or deletions at the beginning** — O(1) vs O(n) for a Python list
+- **Dynamic sizing** where you don't know the final length in advance
+- **Building other structures** like stacks, queues, or graphs
+
+In practice, Python's built-in `list` and `collections.deque` cover most needs. But understanding linked lists is essential for interviews, understanding memory, and building more advanced data structures.
+
+## Common Mistake: Lost Nodes
+
+When inserting or removing nodes, forgetting to update `next` pointers can cause nodes to become unreachable or create infinite loops:
+
+```python
+# ❌ Inserting without updating pointers correctly
+new_node = Node(5)
+new_node.next = current.next   # Point new node to the next node
+current.next = new_node         # Point current node to new node
+# Order matters! Reversing these lines loses the rest of the list.
+```
+
+**Rule:** Always link the new node to its successor **before** unlinking the predecessor from the old successor.
+
+## What's Next?
+
+Linked lists give you flexible insertion and deletion. But what if you need **instant lookups** by key? That's the superpower of **Hash Tables** — Python's dictionaries under the hood.

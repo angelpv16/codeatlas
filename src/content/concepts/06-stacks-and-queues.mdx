@@ -1,0 +1,178 @@
+---
+title: "Stacks and Queues"
+titleEs: "Stacks y Queues"
+description: "Understand two fundamental data structures with opposite access patterns: LIFO stacks and FIFO queues."
+descriptionEs: "Comprende dos estructuras de datos fundamentales con patrones de acceso opuestos: stacks LIFO y queues FIFO."
+order: 6
+section: "dsa"
+level: "beginner"
+estimatedMinutes: 8
+tags: ["dsa", "stack", "queue", "data-structures"]
+relatedConcepts: ["05-arrays-and-lists", "07-linked-lists"]
+hasAnimation: true
+publishedAt: 2025-06-01
+---
+
+## Two Structures, Opposite Rules
+
+Stacks and queues are both built on top of lists, but they restrict **how** you add and remove items. This restriction is what makes them powerful — each one is perfect for a specific category of problems.
+
+<div class="atlas-animation">
+  <div class="sq-container">
+    <div class="sq-panel">
+      <div class="sq-label">Stack (LIFO)</div>
+      <div class="sq-stack">
+        <div class="sq-item sq-item--stack" style="--i:0">c</div>
+        <div class="sq-item sq-item--stack" style="--i:1">b</div>
+        <div class="sq-item sq-item--stack" style="--i:2">a</div>
+      </div>
+      <div class="sq-arrow sq-arrow--top">&#8593; pop / push</div>
+    </div>
+    <div class="sq-panel">
+      <div class="sq-label">Queue (FIFO)</div>
+      <div class="sq-queue">
+        <div class="sq-arrow sq-arrow--left">&#8592; out</div>
+        <div class="sq-item sq-item--queue" style="--i:0">a</div>
+        <div class="sq-item sq-item--queue" style="--i:1">b</div>
+        <div class="sq-item sq-item--queue" style="--i:2">c</div>
+        <div class="sq-arrow sq-arrow--right">in &#8594;</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>{`
+  .sq-container {
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+    padding: 2rem 0;
+    flex-wrap: wrap;
+  }
+  .sq-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .sq-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: #6366f1;
+    font-weight: 600;
+  }
+  .sq-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .sq-queue {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .sq-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: #e2e8f0;
+    background: #1e2330;
+    border: 1px solid #2a3040;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1.5rem;
+    text-align: center;
+    opacity: 0;
+    animation: fadeSlideIn 0.4s ease forwards;
+    animation-delay: calc(var(--i) * 0.15s);
+  }
+  .sq-item--stack:first-child {
+    border-color: #22d3ee;
+    box-shadow: 0 0 8px rgba(34, 211, 238, 0.2);
+  }
+  .sq-item--queue:first-of-type {
+    border-color: #22d3ee;
+    box-shadow: 0 0 8px rgba(34, 211, 238, 0.2);
+  }
+  .sq-arrow {
+    font-size: 0.75rem;
+    color: #6366f1;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .sq-arrow--top { margin-bottom: 0.25rem; }
+  .sq-arrow--left, .sq-arrow--right { padding: 0 0.25rem; }
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+`}</style>
+
+## Stack — Last In, First Out (LIFO)
+
+Imagine a stack of plates. You always place a new plate on **top**, and you always take from the **top**. The last plate you added is the first one you remove.
+
+```python
+stack = []
+stack.append("a")   # push
+stack.append("b")
+stack.append("c")
+print(stack.pop())   # "c" — last in, first out
+print(stack.pop())   # "b"
+print(stack)         # ["a"]
+```
+
+### Real-World Stack Use Cases
+
+- **Undo/Redo** — each action is pushed onto the stack; undo pops the last one
+- **Browser back button** — visited pages are pushed; going back pops the last
+- **Call stack** — when a function calls another function, the current one is pushed onto the stack
+
+## Queue — First In, First Out (FIFO)
+
+Imagine a line of people at a coffee shop. The first person in line is the first one served. New people join at the **back**, and people leave from the **front**.
+
+```python
+from collections import deque
+
+queue = deque()
+queue.append("first")
+queue.append("second")
+queue.append("third")
+print(queue.popleft())  # "first" — first in, first out
+print(queue.popleft())  # "second"
+print(queue)            # deque(['third'])
+```
+
+### Real-World Queue Use Cases
+
+- **Task scheduling** — OS processes tasks in the order they arrive
+- **Print queues** — documents print in the order they were sent
+- **BFS traversal** — explores graph nodes level by level using a queue
+
+## Stack vs Queue at a Glance
+
+| Property | Stack | Queue |
+|---|---|---|
+| Order | LIFO | FIFO |
+| Insert | Top (push) | Back (enqueue) |
+| Remove | Top (pop) | Front (dequeue) |
+| Python | `list.append()` / `list.pop()` | `deque.append()` / `deque.popleft()` |
+
+## Common Mistake: Using `list.pop(0)` for Queues
+
+You might be tempted to use a regular list as a queue:
+
+```python
+# ❌ Slow — O(n) because all elements shift
+queue = [1, 2, 3]
+queue.pop(0)  # removes 1, but shifts 2 and 3
+
+# ✅ Fast — O(1) with deque
+from collections import deque
+queue = deque([1, 2, 3])
+queue.popleft()  # removes 1, no shifting needed
+```
+
+`list.pop(0)` is **O(n)** because every remaining element has to shift one position. `deque.popleft()` is **O(1)** — it just moves a pointer.
+
+## What's Next?
+
+Stacks and queues restrict access to make certain problems easy. But what if you need a structure where inserting and removing elements at **any position** is efficient? That's where **Linked Lists** come in.

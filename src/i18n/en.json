@@ -61,6 +61,11 @@
   "footer.nav": "Navigation",
   "footer.project": "Project",
   "footer.source": "Source code",
+  "section.fundamentals": "Python Fundamentals",
+  "section.dsa": "Data Structures & Algorithms",
+  "map.filterAll": "All",
+  "map.filterFundamentals": "Fundamentals",
+  "map.filterDSA": "DSA",
   "lang.en": "EN",
   "lang.es": "ES"
 }

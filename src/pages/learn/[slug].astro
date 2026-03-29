@@ -67,6 +67,34 @@ const quizzes: Record<string, { question: string; questionEs: string; options: s
     optionsEs: ['5', '5.0', '2', 'Error'],
     correctIndex: 1,
   },
+  '05-arrays-and-lists': {
+    question: 'What does my_list[-1] return?',
+    questionEs: '¿Qué devuelve my_list[-1]?',
+    options: ['The first item', 'An error', 'The last item', 'Nothing'],
+    optionsEs: ['El primer elemento', 'Un error', 'El último elemento', 'Nada'],
+    correctIndex: 2,
+  },
+  '06-stacks-and-queues': {
+    question: "You're building an undo feature. Which structure fits best?",
+    questionEs: '¿Estás construyendo una función de deshacer. ¿Qué estructura es mejor?',
+    options: ['Queue', 'Stack', 'List', 'Dictionary'],
+    optionsEs: ['Queue', 'Stack', 'Lista', 'Diccionario'],
+    correctIndex: 1,
+  },
+  '07-linked-lists': {
+    question: 'What is the time complexity of accessing the 5th element in a linked list?',
+    questionEs: '¿Cuál es la complejidad temporal de acceder al 5to elemento en una lista enlazada?',
+    options: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'],
+    optionsEs: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'],
+    correctIndex: 2,
+  },
+  '08-hash-tables': {
+    question: 'What is the average time complexity for looking up a value in a hash table?',
+    questionEs: '¿Cuál es la complejidad temporal promedio para buscar un valor en una tabla hash?',
+    options: ['O(n²)', 'O(n)', 'O(log n)', 'O(1)'],
+    optionsEs: ['O(n²)', 'O(n)', 'O(log n)', 'O(1)'],
+    correctIndex: 3,
+  },
 };
 
 const quiz = quizzes[entry.slug];
