@@ -1,0 +1,29 @@
+---
+// Interactive array visualization for the Arrays & Lists concept
+---
+<div class="array-demo my-8 select-none not-prose">
+  <p class="text-xs text-atlas-muted font-mono mb-3 opacity-70">
+    fruits = ["apple", "banana", "cherry", "mango", "kiwi"]
+  </p>
+  <div class="array-row flex gap-2 flex-wrap">
+    {["apple", "banana", "cherry", "mango", "kiwi"].map((item, i) => (
+      <div class="array-cell flex flex-col items-center gap-1" style={`animation-delay: ${i * 100}ms`}>
+        <div class="w-20 h-16 flex items-center justify-center bg-atlas-surface border border-atlas-border rounded-lg text-xs text-atlas-text font-mono cursor-pointer transition-all duration-150 hover:border-atlas-accent hover:bg-indigo-500/10 hover:text-atlas-accent hover:scale-105">
+          "{item}"
+        </div>
+        <span class="text-xs text-atlas-muted font-mono">[{i}]</span>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .array-cell {
+    opacity: 0;
+    animation: fadeSlideUp 0.4s ease forwards;
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>

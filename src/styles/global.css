@@ -28,17 +28,17 @@
   }
 
   ::selection {
-    @apply bg-atlas-accent/30 text-atlas-text-bright;
+    @apply bg-atlas-accent/30 text-atlas-text;
   }
 
   /* Scrollbar styling */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-atlas-bg;
+    @apply bg-transparent;
   }
 
   ::-webkit-scrollbar-thumb {
@@ -52,12 +52,12 @@
 
 @layer components {
   .atlas-card {
-    @apply bg-atlas-surface border border-atlas-border rounded-xl p-6
-           transition-all duration-300 ease-out;
+    @apply bg-atlas-surface border border-atlas-border rounded-xl p-5
+           transition-all duration-200 ease-out;
   }
 
   .atlas-card:hover {
-    @apply -translate-y-0.5 border-atlas-accent/40;
+    @apply border-atlas-border-2 bg-atlas-surface-2;
   }
 
   .atlas-glow {
@@ -66,32 +66,32 @@
 
   .atlas-btn-primary {
     @apply inline-flex items-center gap-2 px-6 py-3 bg-atlas-accent
-           text-white font-medium rounded-lg transition-all duration-200
-           hover:bg-atlas-accent-hover hover:shadow-glow
+           text-white font-medium rounded-lg transition-colors duration-200
+           hover:bg-atlas-accent-dim
            focus:outline-none focus:ring-2 focus:ring-atlas-accent/50;
   }
 
   .atlas-btn-secondary {
     @apply inline-flex items-center gap-2 px-6 py-3 border border-atlas-border
-           text-atlas-text font-medium rounded-lg transition-all duration-200
-           hover:border-atlas-accent/40 hover:text-atlas-text-bright
+           text-atlas-text font-medium rounded-lg transition-colors duration-200
+           hover:border-atlas-border-2 hover:text-atlas-text-bright
            focus:outline-none focus:ring-2 focus:ring-atlas-accent/50;
   }
 
   .atlas-badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center px-2 py-0.5 rounded-md text-xs font-mono;
   }
 
   .atlas-badge-beginner {
-    @apply atlas-badge bg-atlas-secondary/10 text-atlas-secondary;
+    @apply atlas-badge bg-cyan-500/10 text-cyan-400 border border-cyan-500/20;
   }
 
   .atlas-badge-intermediate {
-    @apply atlas-badge bg-atlas-accent/10 text-atlas-accent;
+    @apply atlas-badge bg-indigo-500/10 text-indigo-400 border border-indigo-500/20;
   }
 
   .atlas-badge-advanced {
-    @apply atlas-badge bg-purple-500/10 text-purple-400;
+    @apply atlas-badge bg-purple-500/10 text-purple-400 border border-purple-500/20;
   }
 }
 
@@ -104,8 +104,8 @@
     --tw-prose-links: theme('colors.atlas.accent');
     --tw-prose-bold: theme('colors.atlas.text-bright');
     --tw-prose-counters: theme('colors.atlas.muted');
-    --tw-prose-bullets: theme('colors.atlas.border');
-    --tw-prose-hr: theme('colors.atlas.border');
+    --tw-prose-bullets: theme('colors.atlas.border-2');
+    --tw-prose-hr: theme('colors.atlas.line');
     --tw-prose-quotes: theme('colors.atlas.text');
     --tw-prose-quote-borders: theme('colors.atlas.accent');
     --tw-prose-captions: theme('colors.atlas.muted');
@@ -114,5 +114,13 @@
     --tw-prose-pre-bg: theme('colors.atlas.code');
     --tw-prose-th-borders: theme('colors.atlas.border');
     --tw-prose-td-borders: theme('colors.atlas.border');
+  }
+
+  .prose-atlas h2 {
+    @apply border-b border-atlas-line pb-2;
+  }
+
+  .prose-atlas blockquote {
+    @apply border-l-2 border-atlas-accent;
   }
 }

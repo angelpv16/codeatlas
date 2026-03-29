@@ -1,0 +1,103 @@
+---
+// Interactive linked list visualization with node insertion
+---
+<div class="ll-demo my-8 not-prose" id="ll-demo">
+  <div class="bg-atlas-surface border border-atlas-border rounded-xl p-4">
+    <p class="text-xs font-mono text-atlas-accent mb-3 font-semibold">Linked List — Node Insertion</p>
+    <div id="ll-nodes" class="flex items-center gap-1 overflow-x-auto pb-2 min-h-[4rem]"></div>
+    <button id="ll-insert-btn" class="mt-3 px-3 py-1 text-xs font-mono bg-atlas-accent/10 text-atlas-accent rounded-md hover:bg-atlas-accent/20 transition-colors">
+      Insert node at position 2
+    </button>
+    <button id="ll-reset-btn" class="mt-3 ml-2 px-3 py-1 text-xs font-mono bg-atlas-border text-atlas-muted rounded-md hover:text-atlas-text transition-colors">
+      Reset
+    </button>
+  </div>
+</div>
+
+<script is:inline>
+(function() {
+  var container = document.getElementById('ll-nodes');
+  var insertBtn = document.getElementById('ll-insert-btn');
+  var resetBtn = document.getElementById('ll-reset-btn');
+  if (!container || !insertBtn || !resetBtn) return;
+
+  var initial = [1, 2, 3];
+  var insertVal = 5;
+  var inserted = false;
+
+  function makeNode(val, isNew) {
+    var node = document.createElement('div');
+    node.className = 'll-node flex items-center gap-1 transition-all duration-300';
+    if (isNew) {
+      node.style.opacity = '0';
+      node.style.transform = 'translateY(-10px)';
+    }
+
+    var box = document.createElement('div');
+    box.className = 'flex flex-col items-center bg-atlas-surface-2 border rounded-lg px-3 py-2 ' +
+      (isNew ? 'border-atlas-cyan shadow-[0_0_8px_rgba(34,211,238,0.2)]' : 'border-atlas-border-2');
+
+    var valSpan = document.createElement('span');
+    valSpan.className = 'text-sm font-mono font-semibold ' + (isNew ? 'text-atlas-cyan' : 'text-atlas-text');
+    valSpan.textContent = val;
+
+    var ptrSpan = document.createElement('span');
+    ptrSpan.className = 'text-[0.6rem] font-mono text-atlas-accent mt-0.5';
+    ptrSpan.textContent = 'next';
+
+    box.appendChild(valSpan);
+    box.appendChild(ptrSpan);
+    node.appendChild(box);
+
+    var arrow = document.createElement('span');
+    arrow.className = 'text-atlas-accent text-xs font-mono';
+    arrow.textContent = '\u2192';
+    node.appendChild(arrow);
+
+    return node;
+  }
+
+  function makeNone() {
+    var span = document.createElement('span');
+    span.className = 'text-xs font-mono text-atlas-muted';
+    span.textContent = 'None';
+    return span;
+  }
+
+  function render(values, newIdx) {
+    container.innerHTML = '';
+    values.forEach(function(val, i) {
+      var node = makeNode(val, i === newIdx);
+      container.appendChild(node);
+      if (i === newIdx) {
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            node.style.opacity = '1';
+            node.style.transform = 'translateY(0)';
+          });
+        });
+      }
+    });
+    container.appendChild(makeNone());
+  }
+
+  render(initial, -1);
+
+  insertBtn.addEventListener('click', function() {
+    if (inserted) return;
+    inserted = true;
+    var vals = initial.slice();
+    vals.splice(2, 0, insertVal);
+    render(vals, 2);
+    insertBtn.classList.add('opacity-50');
+    insertBtn.style.pointerEvents = 'none';
+  });
+
+  resetBtn.addEventListener('click', function() {
+    inserted = false;
+    render(initial, -1);
+    insertBtn.classList.remove('opacity-50');
+    insertBtn.style.pointerEvents = '';
+  });
+})();
+</script>

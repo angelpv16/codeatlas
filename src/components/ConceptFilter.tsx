@@ -17,12 +17,6 @@ interface ConceptFilterProps {
   lang?: 'en' | 'es';
 }
 
-const levelColors = {
-  beginner: 'bg-atlas-secondary/10 text-atlas-secondary',
-  intermediate: 'bg-atlas-accent/10 text-atlas-accent',
-  advanced: 'bg-purple-500/10 text-purple-400',
-};
-
 const levelLabels = {
   en: { all: 'All', beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' },
   es: { all: 'Todos', beginner: 'Principiante', intermediate: 'Intermedio', advanced: 'Avanzado' },
@@ -31,6 +25,12 @@ const levelLabels = {
 const sectionLabels = {
   en: { all: 'All', fundamentals: 'Fundamentals', dsa: 'DSA' },
   es: { all: 'Todo', fundamentals: 'Fundamentos', dsa: 'DSA' },
+};
+
+const badgeClasses: Record<string, string> = {
+  beginner: 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20',
+  intermediate: 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20',
+  advanced: 'bg-purple-500/10 text-purple-400 border border-purple-500/20',
 };
 
 export default function ConceptFilter({ concepts, lang = 'en' }: ConceptFilterProps) {
@@ -46,7 +46,18 @@ export default function ConceptFilter({ concepts, lang = 'en' }: ConceptFilterPr
     return matchLevel && matchSection;
   });
 
-  const readTimeLabel = lang === 'es' ? 'min de lectura' : 'min read';
+  const tabClass = (active: boolean) =>
+    `px-3 py-1.5 text-sm font-medium transition-colors duration-200 border-b-2 ${
+      active
+        ? 'text-atlas-accent border-atlas-accent'
+        : 'text-atlas-muted border-transparent hover:text-atlas-text'
+    }`;
+
+  const sectionFilters = [
+    { key: 'all', label: secLabels.all },
+    { key: 'fundamentals', label: secLabels.fundamentals },
+    { key: 'dsa', label: secLabels.dsa },
+  ];
 
   const levelFilters = [
     { key: 'all', label: labels.all },
@@ -55,41 +66,30 @@ export default function ConceptFilter({ concepts, lang = 'en' }: ConceptFilterPr
     { key: 'advanced', label: labels.advanced },
   ];
 
-  const sectionFilters = [
-    { key: 'all', label: secLabels.all },
-    { key: 'fundamentals', label: secLabels.fundamentals },
-    { key: 'dsa', label: secLabels.dsa },
-  ];
-
-  const btnClass = (active: boolean) =>
-    `px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-      active
-        ? 'bg-atlas-accent text-white'
-        : 'bg-atlas-surface border border-atlas-border text-atlas-muted hover:border-atlas-accent/40 hover:text-atlas-text-bright'
-    }`;
-
   return (
     <div>
-      {/* Section filter */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      {/* Filter rows */}
+      <div className="flex flex-wrap items-center gap-6 mb-4 border-b border-atlas-line pb-0">
         {sectionFilters.map((f) => (
           <button
             key={f.key}
             onClick={() => setSectionFilter(f.key)}
-            className={btnClass(sectionFilter === f.key)}
+            className={tabClass(sectionFilter === f.key)}
           >
             {f.label}
           </button>
         ))}
       </div>
-
-      {/* Level filter */}
-      <div className="flex flex-wrap gap-2 mb-8">
+      <div className="flex flex-wrap items-center gap-4 mb-10">
         {levelFilters.map((f) => (
           <button
             key={f.key}
             onClick={() => setLevelFilter(f.key)}
-            className={btnClass(levelFilter === f.key)}
+            className={`px-3 py-1 rounded-md text-xs font-mono transition-colors duration-200 ${
+              levelFilter === f.key
+                ? 'bg-atlas-accent/10 text-atlas-accent'
+                : 'text-atlas-muted hover:text-atlas-text'
+            }`}
           >
             {f.label}
           </button>
@@ -103,35 +103,38 @@ export default function ConceptFilter({ concepts, lang = 'en' }: ConceptFilterPr
           .map((concept) => {
             const displayTitle = lang === 'es' ? concept.titleEs : concept.title;
             const displayDesc = lang === 'es' ? concept.descriptionEs : concept.description;
-            const badgeClass = levelColors[concept.level];
+            const badgeClass = badgeClasses[concept.level] || '';
             const levelLabel = labels[concept.level as keyof typeof labels] || concept.level;
+            const sectionTag = concept.section === 'dsa' ? 'DSA' : (lang === 'es' ? 'Fundamentos' : 'Fundamentals');
 
             return (
               <a
                 key={concept.slug}
                 href={`${base}learn/${concept.slug}/`}
-                className="group bg-atlas-surface border border-atlas-border rounded-xl p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-atlas-accent/40 block"
+                className="group block bg-atlas-surface border border-atlas-border rounded-xl p-5 transition-all duration-200 hover:border-atlas-border-2 hover:bg-atlas-surface-2"
               >
-                <div className="flex items-center gap-2 mb-3">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClass}`}>
+                <div className="flex items-center justify-between mb-4">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-mono ${badgeClass}`}>
                     {levelLabel}
                   </span>
-                  <span className="text-xs text-atlas-muted">
-                    {concept.estimatedMinutes} {readTimeLabel}
+                  <span className="text-xs text-atlas-muted font-mono">
+                    {concept.estimatedMinutes} min
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold text-atlas-text-bright mb-2 group-hover:text-atlas-accent transition-colors">
+                <h3 className="text-base font-medium text-atlas-text mb-2 group-hover:text-atlas-accent transition-colors duration-200">
                   {displayTitle}
                 </h3>
-                <p className="text-sm text-atlas-muted leading-relaxed mb-4">
+                <p className="text-sm text-atlas-muted leading-relaxed line-clamp-2 mb-4">
                   {displayDesc}
                 </p>
-                <span className="inline-flex items-center text-sm text-atlas-accent font-medium">
-                  <span>{lang === 'es' ? 'Leer' : 'Read'}</span>
-                  <svg className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-atlas-muted font-mono opacity-60">
+                    {sectionTag}
+                  </span>
+                  <svg className="w-4 h-4 text-atlas-muted group-hover:text-atlas-accent group-hover:translate-x-0.5 transition-all duration-200" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                   </svg>
-                </span>
+                </div>
               </a>
             );
           })}

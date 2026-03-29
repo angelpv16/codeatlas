@@ -1,0 +1,92 @@
+---
+// Interactive stack & queue visualization
+---
+<div class="sq-demo my-8 not-prose" id="sq-demo">
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <!-- Stack panel -->
+    <div class="bg-atlas-surface border border-atlas-border rounded-xl p-4">
+      <p class="text-xs font-mono text-atlas-accent mb-1 font-semibold">Stack (LIFO)</p>
+      <p class="text-xs text-atlas-muted mb-3">Last In, First Out</p>
+      <div id="stack-items" class="flex flex-col-reverse gap-1 min-h-[8rem] mb-3"></div>
+      <div class="flex gap-2">
+        <button id="stack-push" class="px-3 py-1 text-xs font-mono bg-atlas-accent/10 text-atlas-accent rounded-md hover:bg-atlas-accent/20 transition-colors">Push</button>
+        <button id="stack-pop" class="px-3 py-1 text-xs font-mono bg-atlas-border text-atlas-muted rounded-md hover:text-atlas-text transition-colors">Pop</button>
+      </div>
+    </div>
+
+    <!-- Queue panel -->
+    <div class="bg-atlas-surface border border-atlas-border rounded-xl p-4">
+      <p class="text-xs font-mono text-atlas-accent mb-1 font-semibold">Queue (FIFO)</p>
+      <p class="text-xs text-atlas-muted mb-3">First In, First Out</p>
+      <div id="queue-items" class="flex gap-1 min-h-[3rem] items-center overflow-x-auto mb-3"></div>
+      <div class="flex gap-2">
+        <button id="queue-enqueue" class="px-3 py-1 text-xs font-mono bg-atlas-accent/10 text-atlas-accent rounded-md hover:bg-atlas-accent/20 transition-colors">Enqueue</button>
+        <button id="queue-dequeue" class="px-3 py-1 text-xs font-mono bg-atlas-border text-atlas-muted rounded-md hover:text-atlas-text transition-colors">Dequeue</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+(function() {
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
+  let stackIdx = 0;
+  let queueIdx = 0;
+  const MAX = 5;
+
+  const stackEl = document.getElementById('stack-items');
+  const queueEl = document.getElementById('queue-items');
+  if (!stackEl || !queueEl) return;
+
+  function makeItem(text, cls) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    div.className = 'sq-item px-4 py-2 text-xs font-mono text-center rounded-md border transition-all duration-200 ' + cls;
+    return div;
+  }
+
+  // Stack
+  document.getElementById('stack-push')?.addEventListener('click', function() {
+    if (stackEl.children.length >= MAX) return;
+    const item = makeItem(letters[stackIdx % 26], 'bg-atlas-surface-2 border-atlas-border-2 text-atlas-text');
+    item.style.opacity = '0';
+    item.style.transform = 'translateY(-8px)';
+    stackEl.prepend(item);
+    requestAnimationFrame(function() {
+      item.style.opacity = '1';
+      item.style.transform = 'translateY(0)';
+    });
+    stackIdx++;
+  });
+
+  document.getElementById('stack-pop')?.addEventListener('click', function() {
+    const first = stackEl.firstElementChild;
+    if (!first) return;
+    first.style.opacity = '0';
+    first.style.transform = 'translateY(-8px)';
+    setTimeout(function() { first.remove(); }, 200);
+  });
+
+  // Queue
+  document.getElementById('queue-enqueue')?.addEventListener('click', function() {
+    if (queueEl.children.length >= MAX) return;
+    const item = makeItem(letters[queueIdx % 26], 'bg-atlas-surface-2 border-atlas-border-2 text-atlas-text');
+    item.style.opacity = '0';
+    item.style.transform = 'translateX(8px)';
+    queueEl.appendChild(item);
+    requestAnimationFrame(function() {
+      item.style.opacity = '1';
+      item.style.transform = 'translateX(0)';
+    });
+    queueIdx++;
+  });
+
+  document.getElementById('queue-dequeue')?.addEventListener('click', function() {
+    const first = queueEl.firstElementChild;
+    if (!first) return;
+    first.style.opacity = '0';
+    first.style.transform = 'translateX(-8px)';
+    setTimeout(function() { first.remove(); }, 200);
+  });
+})();
+</script>

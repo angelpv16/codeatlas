@@ -12,98 +12,13 @@ relatedConcepts: ["05-arrays-and-lists", "07-linked-lists"]
 hasAnimation: true
 publishedAt: 2025-06-01
 ---
+import StackAnimation from '../../components/animations/StackAnimation.astro';
 
 ## Two Structures, Opposite Rules
 
 Stacks and queues are both built on top of lists, but they restrict **how** you add and remove items. This restriction is what makes them powerful — each one is perfect for a specific category of problems.
 
-<div class="atlas-animation">
-  <div class="sq-container">
-    <div class="sq-panel">
-      <div class="sq-label">Stack (LIFO)</div>
-      <div class="sq-stack">
-        <div class="sq-item sq-item--stack" style="--i:0">c</div>
-        <div class="sq-item sq-item--stack" style="--i:1">b</div>
-        <div class="sq-item sq-item--stack" style="--i:2">a</div>
-      </div>
-      <div class="sq-arrow sq-arrow--top">&#8593; pop / push</div>
-    </div>
-    <div class="sq-panel">
-      <div class="sq-label">Queue (FIFO)</div>
-      <div class="sq-queue">
-        <div class="sq-arrow sq-arrow--left">&#8592; out</div>
-        <div class="sq-item sq-item--queue" style="--i:0">a</div>
-        <div class="sq-item sq-item--queue" style="--i:1">b</div>
-        <div class="sq-item sq-item--queue" style="--i:2">c</div>
-        <div class="sq-arrow sq-arrow--right">in &#8594;</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<style>{`
-  .sq-container {
-    display: flex;
-    gap: 3rem;
-    justify-content: center;
-    padding: 2rem 0;
-    flex-wrap: wrap;
-  }
-  .sq-panel {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  .sq-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-    color: #6366f1;
-    font-weight: 600;
-  }
-  .sq-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-  .sq-queue {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-  .sq-item {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-    color: #e2e8f0;
-    background: #1e2330;
-    border: 1px solid #2a3040;
-    border-radius: 0.375rem;
-    padding: 0.5rem 1.5rem;
-    text-align: center;
-    opacity: 0;
-    animation: fadeSlideIn 0.4s ease forwards;
-    animation-delay: calc(var(--i) * 0.15s);
-  }
-  .sq-item--stack:first-child {
-    border-color: #22d3ee;
-    box-shadow: 0 0 8px rgba(34, 211, 238, 0.2);
-  }
-  .sq-item--queue:first-of-type {
-    border-color: #22d3ee;
-    box-shadow: 0 0 8px rgba(34, 211, 238, 0.2);
-  }
-  .sq-arrow {
-    font-size: 0.75rem;
-    color: #6366f1;
-    font-family: 'JetBrains Mono', monospace;
-  }
-  .sq-arrow--top { margin-bottom: 0.25rem; }
-  .sq-arrow--left, .sq-arrow--right { padding: 0 0.25rem; }
-  @keyframes fadeSlideIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-`}</style>
+<StackAnimation />
 
 ## Stack — Last In, First Out (LIFO)
 

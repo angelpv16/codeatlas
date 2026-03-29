@@ -1,0 +1,53 @@
+---
+// Inline typing terminal for the "What is Programming?" concept
+---
+<div class="terminal-inline my-8 not-prose bg-[#0a0c12] border border-atlas-border rounded-xl p-4 font-mono text-sm">
+  <div class="flex items-center gap-1.5 mb-3">
+    <span class="w-2 h-2 rounded-full bg-[#ff5f57]"></span>
+    <span class="w-2 h-2 rounded-full bg-[#febc2e]"></span>
+    <span class="w-2 h-2 rounded-full bg-[#28c840]"></span>
+    <span class="ml-2 text-xs text-atlas-muted opacity-50">hello.py</span>
+  </div>
+  <div class="text-atlas-text leading-7 min-h-[4.5rem]">
+    <span class="text-atlas-muted">$ </span><span id="inline-typed" class="text-atlas-cyan whitespace-pre-wrap"></span><span id="inline-cursor" class="inline-block w-0.5 h-4 bg-atlas-cyan align-middle animate-pulse ml-0.5"></span>
+  </div>
+</div>
+
+<script is:inline>
+(function() {
+  const el = document.getElementById('inline-typed');
+  const cursor = document.getElementById('inline-cursor');
+  if (!el || !cursor) return;
+
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reducedMotion) {
+    el.textContent = 'python3 hello.py\nHello, world!';
+    cursor.style.display = 'none';
+    return;
+  }
+
+  var lines = [
+    { text: 'python3 hello.py', delay: 60, pause: 800 },
+    { text: '\nHello, world!', delay: 40, pause: 0 },
+  ];
+
+  var full = '';
+
+  function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+  async function run() {
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i];
+      for (var j = 0; j < line.text.length; j++) {
+        full += line.text[j];
+        el.textContent = full;
+        await sleep(line.delay + Math.random() * 15);
+      }
+      await sleep(line.pause);
+    }
+    cursor.style.animationIterationCount = '6';
+  }
+
+  run();
+})();
+</script>

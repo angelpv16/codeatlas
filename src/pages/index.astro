@@ -17,74 +17,79 @@ const base = import.meta.env.BASE_URL;
 
   <main class="flex-1">
     <!-- Hero Section -->
-    <section class="relative overflow-hidden py-24 sm:py-32">
-      <!-- Background animation -->
-      <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-atlas-accent/5 rounded-full blur-3xl animate-pulse"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-atlas-secondary/5 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
-        <!-- Floating code lines -->
-        <div class="absolute top-20 right-10 text-atlas-accent/10 font-mono text-sm hidden lg:block">
-          <div class="animate-float">print("Hello, world!")</div>
-          <div class="animate-float" style="animation-delay: 0.5s;">name = "Atlas"</div>
-          <div class="animate-float" style="animation-delay: 1s;">x = 42</div>
-        </div>
-      </div>
+    <section class="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+      <canvas id="hero-canvas" class="absolute inset-0 w-full h-full"></canvas>
 
-      <div class="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-atlas-text-bright leading-tight mb-6" data-i18n="hero.title">
-          {t('hero.title', lang)}
+      <div class="relative z-10 text-center max-w-3xl mx-auto px-6">
+        <!-- Eyebrow -->
+        <span class="inline-block text-xs font-mono tracking-widest text-atlas-accent uppercase mb-6 opacity-70">
+          Visual Programming Education
+        </span>
+
+        <!-- Headline -->
+        <h1 class="text-5xl md:text-7xl font-semibold tracking-tight text-atlas-text leading-none mb-6" data-i18n="hero.title">
+          {lang === 'es' ? 'Aprende programación' : 'Learn programming'}<br/>
+          <span class="text-atlas-accent">{lang === 'es' ? 'de forma visual.' : 'visually.'}</span>
         </h1>
-        <p class="text-lg sm:text-xl text-atlas-muted max-w-2xl mx-auto mb-10" data-i18n="hero.subtitle">
+
+        <!-- Subtitle -->
+        <p class="text-lg text-atlas-muted-2 max-w-xl mx-auto mb-10 leading-relaxed" data-i18n="hero.subtitle">
           {t('hero.subtitle', lang)}
         </p>
-        <a href={`${base}map/`} class="atlas-btn-primary text-lg">
+
+        <!-- Terminal animation -->
+        <div class="terminal-demo bg-[#0a0c12] border border-atlas-border rounded-xl p-5 text-left font-mono text-sm max-w-sm mx-auto mb-12">
+          <div class="flex items-center gap-1.5 mb-4">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f57]"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-[#febc2e]"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-[#28c840]"></span>
+            <span class="ml-2 text-xs text-atlas-muted opacity-50">main.py</span>
+          </div>
+          <div id="terminal-output" class="text-atlas-text leading-7 min-h-[10.5rem]">
+            <span class="text-atlas-muted">$ </span><span id="typed-code" class="text-atlas-cyan whitespace-pre-wrap"></span><span id="cursor" class="inline-block w-0.5 h-4 bg-atlas-cyan align-middle animate-pulse ml-0.5"></span>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <a href={`${base}learn/01-what-is-programming/`} class="inline-flex items-center gap-2 px-6 py-3 bg-atlas-accent text-white text-sm font-medium rounded-lg hover:bg-atlas-accent-dim transition-colors duration-200">
           <span data-i18n="hero.cta">{t('hero.cta', lang)}</span>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </a>
       </div>
     </section>
 
-    <!-- What is CodeAtlas -->
-    <section class="py-24 border-t border-atlas-border">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6">
-        <h2 class="text-3xl font-bold text-atlas-text-bright text-center mb-16" data-i18n="features.title">
+    <!-- Features -->
+    <section class="py-24 border-t border-atlas-line">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6">
+        <h2 class="text-2xl font-semibold text-atlas-text-bright text-center mb-16" data-i18n="features.title">
           {t('features.title', lang)}
         </h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- Visual Learning -->
-          <div class="atlas-card text-center">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-atlas-accent/10 flex items-center justify-center">
-              <svg class="w-6 h-6 text-atlas-accent" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-atlas-text-bright mb-2" data-i18n="features.visual.title">{t('features.visual.title', lang)}</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div class="text-center md:text-left">
+            <svg class="w-5 h-5 text-atlas-accent mb-3 mx-auto md:mx-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <h3 class="text-sm font-medium text-atlas-text mb-1" data-i18n="features.visual.title">{t('features.visual.title', lang)}</h3>
             <p class="text-sm text-atlas-muted leading-relaxed" data-i18n="features.visual.desc">{t('features.visual.desc', lang)}</p>
           </div>
 
-          <!-- Progressive Path -->
-          <div class="atlas-card text-center">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-atlas-secondary/10 flex items-center justify-center">
-              <svg class="w-6 h-6 text-atlas-secondary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-atlas-text-bright mb-2" data-i18n="features.progressive.title">{t('features.progressive.title', lang)}</h3>
+          <div class="text-center md:text-left">
+            <svg class="w-5 h-5 text-atlas-accent mb-3 mx-auto md:mx-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <h3 class="text-sm font-medium text-atlas-text mb-1" data-i18n="features.progressive.title">{t('features.progressive.title', lang)}</h3>
             <p class="text-sm text-atlas-muted leading-relaxed" data-i18n="features.progressive.desc">{t('features.progressive.desc', lang)}</p>
           </div>
 
-          <!-- Python First -->
-          <div class="atlas-card text-center">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-purple-500/10 flex items-center justify-center">
-              <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-atlas-text-bright mb-2" data-i18n="features.python.title">{t('features.python.title', lang)}</h3>
+          <div class="text-center md:text-left">
+            <svg class="w-5 h-5 text-atlas-accent mb-3 mx-auto md:mx-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+            </svg>
+            <h3 class="text-sm font-medium text-atlas-text mb-1" data-i18n="features.python.title">{t('features.python.title', lang)}</h3>
             <p class="text-sm text-atlas-muted leading-relaxed" data-i18n="features.python.desc">{t('features.python.desc', lang)}</p>
           </div>
         </div>
@@ -92,9 +97,9 @@ const base = import.meta.env.BASE_URL;
     </section>
 
     <!-- Featured Concepts -->
-    <section class="py-24 border-t border-atlas-border">
+    <section class="py-24 border-t border-atlas-line">
       <div class="max-w-6xl mx-auto px-4 sm:px-6">
-        <h2 class="text-3xl font-bold text-atlas-text-bright text-center mb-16" data-i18n="featured.title">
+        <h2 class="text-2xl font-semibold text-atlas-text-bright text-center mb-16" data-i18n="featured.title">
           {t('featured.title', lang)}
         </h2>
 
@@ -106,6 +111,7 @@ const base = import.meta.env.BASE_URL;
               description={concept.data.description}
               descriptionEs={concept.data.descriptionEs}
               level={concept.data.level}
+              section={concept.data.section}
               estimatedMinutes={concept.data.estimatedMinutes}
               slug={concept.slug}
               lang={lang}
@@ -116,50 +122,41 @@ const base = import.meta.env.BASE_URL;
     </section>
 
     <!-- How it works -->
-    <section class="py-24 border-t border-atlas-border">
+    <section class="py-24 border-t border-atlas-line">
       <div class="max-w-4xl mx-auto px-4 sm:px-6">
-        <h2 class="text-3xl font-bold text-atlas-text-bright text-center mb-16" data-i18n="howItWorks.title">
+        <h2 class="text-2xl font-semibold text-atlas-text-bright text-center mb-16" data-i18n="howItWorks.title">
           {t('howItWorks.title', lang)}
         </h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- Step 1 -->
-          <div class="text-center">
-            <div class="w-10 h-10 mx-auto mb-4 rounded-full bg-atlas-accent/10 flex items-center justify-center text-atlas-accent font-bold">
-              1
-            </div>
-            <h3 class="text-lg font-semibold text-atlas-text-bright mb-2" data-i18n="howItWorks.step1.title">{t('howItWorks.step1.title', lang)}</h3>
-            <p class="text-sm text-atlas-muted" data-i18n="howItWorks.step1.desc">{t('howItWorks.step1.desc', lang)}</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div>
+            <span class="block font-mono text-3xl text-atlas-accent/20 font-bold mb-2">01</span>
+            <h3 class="text-base font-medium text-atlas-text mb-1" data-i18n="howItWorks.step1.title">{t('howItWorks.step1.title', lang)}</h3>
+            <p class="text-sm text-atlas-muted leading-relaxed" data-i18n="howItWorks.step1.desc">{t('howItWorks.step1.desc', lang)}</p>
           </div>
 
-          <!-- Step 2 -->
-          <div class="text-center">
-            <div class="w-10 h-10 mx-auto mb-4 rounded-full bg-atlas-accent/10 flex items-center justify-center text-atlas-accent font-bold">
-              2
-            </div>
-            <h3 class="text-lg font-semibold text-atlas-text-bright mb-2" data-i18n="howItWorks.step2.title">{t('howItWorks.step2.title', lang)}</h3>
-            <p class="text-sm text-atlas-muted" data-i18n="howItWorks.step2.desc">{t('howItWorks.step2.desc', lang)}</p>
+          <div>
+            <span class="block font-mono text-3xl text-atlas-accent/20 font-bold mb-2">02</span>
+            <h3 class="text-base font-medium text-atlas-text mb-1" data-i18n="howItWorks.step2.title">{t('howItWorks.step2.title', lang)}</h3>
+            <p class="text-sm text-atlas-muted leading-relaxed" data-i18n="howItWorks.step2.desc">{t('howItWorks.step2.desc', lang)}</p>
           </div>
 
-          <!-- Step 3 -->
-          <div class="text-center">
-            <div class="w-10 h-10 mx-auto mb-4 rounded-full bg-atlas-accent/10 flex items-center justify-center text-atlas-accent font-bold">
-              3
-            </div>
-            <h3 class="text-lg font-semibold text-atlas-text-bright mb-2" data-i18n="howItWorks.step3.title">{t('howItWorks.step3.title', lang)}</h3>
-            <p class="text-sm text-atlas-muted" data-i18n="howItWorks.step3.desc">{t('howItWorks.step3.desc', lang)}</p>
+          <div>
+            <span class="block font-mono text-3xl text-atlas-accent/20 font-bold mb-2">03</span>
+            <h3 class="text-base font-medium text-atlas-text mb-1" data-i18n="howItWorks.step3.title">{t('howItWorks.step3.title', lang)}</h3>
+            <p class="text-sm text-atlas-muted leading-relaxed" data-i18n="howItWorks.step3.desc">{t('howItWorks.step3.desc', lang)}</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- CTA Strip -->
-    <section class="py-24 border-t border-atlas-border">
+    <section class="py-24 border-t border-atlas-line">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-        <a href={`${base}learn/01-what-is-programming/`} class="atlas-btn-primary text-lg">
+        <a href={`${base}learn/01-what-is-programming/`} class="atlas-btn-primary text-sm">
           <span data-i18n="hero.cta2">{t('hero.cta2', lang)}</span>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </a>
       </div>
@@ -169,12 +166,149 @@ const base = import.meta.env.BASE_URL;
   <Footer lang={lang} />
 </Layout>
 
-<style>
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); opacity: 0.1; }
-    50% { transform: translateY(-10px); opacity: 0.2; }
-  }
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-</style>
+<script is:inline>
+  // Node network canvas animation
+  (function() {
+    const canvas = document.getElementById('hero-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let nodes = [];
+    const NODE_COUNT = 60;
+    const MAX_DIST = 120;
+
+    function resize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+    }
+
+    function initNodes() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      nodes = [];
+      for (let i = 0; i < NODE_COUNT; i++) {
+        nodes.push({
+          x: Math.random() * rect.width,
+          y: Math.random() * rect.height,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+        });
+      }
+    }
+
+    function draw() {
+      const w = canvas.width / window.devicePixelRatio;
+      const h = canvas.height / window.devicePixelRatio;
+      ctx.clearRect(0, 0, w, h);
+
+      // Draw lines between close nodes
+      ctx.strokeStyle = 'rgba(99, 102, 241, 0.15)';
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MAX_DIST) {
+            const alpha = 0.15 * (1 - dist / MAX_DIST);
+            ctx.strokeStyle = 'rgba(99, 102, 241, ' + alpha + ')';
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw nodes
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.6)';
+      for (const node of nodes) {
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function update() {
+      const w = canvas.width / window.devicePixelRatio;
+      const h = canvas.height / window.devicePixelRatio;
+      for (const node of nodes) {
+        node.x += node.vx;
+        node.y += node.vy;
+        if (node.x < 0 || node.x > w) node.vx *= -1;
+        if (node.y < 0 || node.y > h) node.vy *= -1;
+      }
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    resize();
+    initNodes();
+
+    if (reducedMotion) {
+      draw();
+    } else {
+      loop();
+    }
+
+    window.addEventListener('resize', () => {
+      resize();
+      initNodes();
+    });
+  })();
+
+  // Terminal typing animation
+  (function() {
+    const output = document.getElementById('typed-code');
+    const cursor = document.getElementById('cursor');
+    if (!output || !cursor) return;
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) {
+      output.textContent = 'print("Welcome to CodeAtlas")';
+      cursor.style.display = 'none';
+      return;
+    }
+
+    const lines = [
+      { text: 'python3 learn.py', delay: 60, pause: 800 },
+      { text: '\n# Variables store data', delay: 40, pause: 300 },
+      { text: '\nname = "CodeAtlas"', delay: 50, pause: 300 },
+      { text: '\nversion = 1.0', delay: 50, pause: 300 },
+      { text: '\nprint(f"Welcome to {name}")', delay: 45, pause: 1000 },
+      { text: '\n\u2192 Welcome to CodeAtlas', delay: 30, pause: 2000 },
+    ];
+
+    let fullText = '';
+
+    function sleep(ms) {
+      return new Promise(function(r) { setTimeout(r, ms); });
+    }
+
+    async function typeLines() {
+      for (const line of lines) {
+        for (const char of line.text) {
+          fullText += char;
+          output.textContent = fullText;
+          await sleep(line.delay + Math.random() * 20);
+        }
+        await sleep(line.pause);
+      }
+      await sleep(3000);
+      fullText = '';
+      output.textContent = '';
+      typeLines();
+    }
+
+    typeLines();
+  })();
+</script>

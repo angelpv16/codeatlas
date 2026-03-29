@@ -100,10 +100,15 @@ const quizzes: Record<string, { question: string; questionEs: string; options: s
 const quiz = quizzes[entry.slug];
 ---
 <Layout title={`${displayTitle} — CodeAtlas`} description={displayDesc} lang={lang}>
+  <!-- Scroll progress bar -->
+  <div class="fixed top-0 left-0 w-full h-0.5 z-50 bg-atlas-border">
+    <div id="progress-bar" class="h-full bg-atlas-accent" style="width: 0%"></div>
+  </div>
+
   <Header lang={lang} />
 
   <main class="flex-1 py-12 sm:py-24">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6">
       <!-- Back to map -->
       <a href={`${base}map/`} class="inline-flex items-center gap-2 text-sm text-atlas-muted hover:text-atlas-accent transition-colors mb-8">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -116,24 +121,24 @@ const quiz = quizzes[entry.slug];
       <header class="mb-12">
         <div class="flex items-center gap-3 mb-4">
           <span class={badgeClass}>{levelLabel}</span>
-          <span class="text-sm text-atlas-muted">{entry.data.estimatedMinutes} {readTime}</span>
+          <span class="text-sm text-atlas-muted font-mono">{entry.data.estimatedMinutes} {readTime}</span>
         </div>
-        <h1 class="text-3xl sm:text-4xl font-bold text-atlas-text-bright mb-4">
+        <h1 class="text-3xl sm:text-4xl font-semibold text-atlas-text-bright tracking-tight mb-4">
           {displayTitle}
         </h1>
-        <p class="text-lg text-atlas-muted">
+        <p class="text-base text-atlas-muted leading-relaxed">
           {displayDesc}
         </p>
       </header>
 
       <!-- MDX Content -->
-      <article class="prose prose-lg prose-atlas max-w-none">
+      <article class="prose prose-base prose-atlas max-w-none leading-8">
         <Content />
       </article>
 
       <!-- Quiz -->
       {quiz && (
-        <section class="mt-16 pt-8 border-t border-atlas-border">
+        <section class="mt-16 pt-8 border-t border-atlas-line">
           <MiniQuiz
             client:load
             question={lang === 'es' ? quiz.questionEs : quiz.question}
@@ -146,7 +151,7 @@ const quiz = quizzes[entry.slug];
       )}
 
       <!-- Navigation -->
-      <nav class="mt-16 pt-8 border-t border-atlas-border flex items-center justify-between">
+      <nav class="mt-16 pt-8 border-t border-atlas-line flex items-center justify-between">
         {prevConcept ? (
           <a href={`${base}learn/${prevConcept.slug}/`} class="atlas-btn-secondary text-sm">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -170,3 +175,15 @@ const quiz = quizzes[entry.slug];
 
   <Footer lang={lang} />
 </Layout>
+
+<script is:inline>
+  const bar = document.getElementById('progress-bar');
+  if (bar) {
+    window.addEventListener('scroll', function() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      bar.style.width = pct.toFixed(1) + '%';
+    }, { passive: true });
+  }
+</script>

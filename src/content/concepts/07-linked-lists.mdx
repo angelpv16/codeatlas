@@ -12,6 +12,7 @@ relatedConcepts: ["05-arrays-and-lists", "06-stacks-and-queues"]
 hasAnimation: true
 publishedAt: 2025-06-01
 ---
+import LinkedListAnimation from '../../components/animations/LinkedListAnimation.astro';
 
 ## What Is a Linked List?
 
@@ -21,77 +22,7 @@ A **linked list** is a sequence of nodes where each node holds a value AND a poi
 
 Think of a treasure hunt. Each clue tells you where the **next** clue is. You can't jump directly to clue 5 — you have to follow clues 1, 2, 3, 4 first. That's exactly how traversing a linked list works.
 
-<div class="atlas-animation">
-  <div class="ll-visual">
-    <div class="ll-node" style="--i:0">
-      <span class="ll-val">1</span>
-      <span class="ll-ptr">next &#8594;</span>
-    </div>
-    <div class="ll-node" style="--i:1">
-      <span class="ll-val">2</span>
-      <span class="ll-ptr">next &#8594;</span>
-    </div>
-    <div class="ll-node ll-node--insert" style="--i:2">
-      <span class="ll-val">5</span>
-      <span class="ll-ptr">next &#8594;</span>
-    </div>
-    <div class="ll-node" style="--i:3">
-      <span class="ll-val">3</span>
-      <span class="ll-ptr">None</span>
-    </div>
-  </div>
-  <div class="ll-caption">Node inserted in the middle</div>
-</div>
-
-<style>{`
-  .ll-visual {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem 0 0.5rem;
-    flex-wrap: wrap;
-  }
-  .ll-node {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #1e2330;
-    border: 1px solid #2a3040;
-    border-radius: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    opacity: 0;
-    animation: fadeSlideIn 0.4s ease forwards;
-    animation-delay: calc(var(--i) * 0.2s);
-  }
-  .ll-node--insert {
-    border-color: #22d3ee;
-    box-shadow: 0 0 12px rgba(34, 211, 238, 0.25);
-  }
-  .ll-val {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1rem;
-    color: #e2e8f0;
-    font-weight: 600;
-  }
-  .ll-ptr {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    color: #6366f1;
-    margin-top: 0.25rem;
-  }
-  .ll-caption {
-    text-align: center;
-    font-size: 0.75rem;
-    color: #6366f1;
-    font-family: 'JetBrains Mono', monospace;
-    padding-bottom: 1rem;
-  }
-  @keyframes fadeSlideIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-`}</style>
+<LinkedListAnimation />
 
 ## Building a Linked List in Python
 
