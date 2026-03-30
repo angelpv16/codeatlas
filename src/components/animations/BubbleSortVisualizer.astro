@@ -1,0 +1,285 @@
+---
+// Interactive bubble sort visualization with step-by-step playback
+---
+<div id="bubble-sort-viz" class="bg-[#0a0c12] border border-[#1e2330] rounded-xl p-6 my-8 not-prose select-none">
+  <!-- Title -->
+  <p class="text-xs font-mono text-atlas-muted mb-4 opacity-70">bubbleSort([64, 34, 25, 12, 22, 11, 90])</p>
+
+  <!-- Bar visualization area -->
+  <div id="bubble-sort-bars" class="h-56 flex items-end justify-center gap-3"></div>
+
+  <!-- Step explanation panel -->
+  <div class="mt-4 mb-4 min-h-[1.5rem]">
+    <p id="bubble-sort-explanation" class="text-xs font-mono text-atlas-muted text-center">&nbsp;</p>
+  </div>
+
+  <!-- Controls bar -->
+  <div class="flex flex-wrap items-center justify-center gap-3">
+    <button id="bubble-sort-play" class="px-3 py-1.5 text-xs font-mono bg-atlas-accent/10 text-atlas-accent rounded-md hover:bg-atlas-accent/20 transition-colors" aria-label="Play or Pause">
+      Play
+    </button>
+    <button id="bubble-sort-step" class="px-3 py-1.5 text-xs font-mono bg-atlas-border text-atlas-muted rounded-md hover:text-atlas-text transition-colors" aria-label="Step forward">
+      Step
+    </button>
+    <button id="bubble-sort-reset" class="px-3 py-1.5 text-xs font-mono bg-atlas-border text-atlas-muted rounded-md hover:text-atlas-text transition-colors" aria-label="Reset">
+      Reset
+    </button>
+    <select id="bubble-sort-speed" class="px-2 py-1.5 text-xs font-mono bg-atlas-surface border border-atlas-border text-atlas-muted rounded-md focus:outline-none focus:border-atlas-accent appearance-none cursor-pointer">
+      <option value="1200">Slow</option>
+      <option value="600" selected>Normal</option>
+      <option value="250">Fast</option>
+    </select>
+    <span id="bubble-sort-counter" class="text-xs font-mono text-atlas-muted opacity-60">Step 0 / 0</span>
+  </div>
+</div>
+
+<script is:inline>
+(function() {
+  var INITIAL_ARRAY = [64, 34, 25, 12, 22, 11, 90];
+  var MIN_HEIGHT = 20;
+  var MAX_HEIGHT = 140;
+
+  var barsContainer = document.getElementById('bubble-sort-bars');
+  var explanationEl = document.getElementById('bubble-sort-explanation');
+  var playBtn = document.getElementById('bubble-sort-play');
+  var stepBtn = document.getElementById('bubble-sort-step');
+  var resetBtn = document.getElementById('bubble-sort-reset');
+  var speedSelect = document.getElementById('bubble-sort-speed');
+  var counterEl = document.getElementById('bubble-sort-counter');
+
+  if (!barsContainer || !explanationEl || !playBtn || !stepBtn || !resetBtn || !speedSelect || !counterEl) return;
+
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var steps = [];
+  var currentStep = -1;
+  var isPlaying = false;
+  var playTimer = null;
+
+  function computeBarHeight(value) {
+    var minVal = Math.min.apply(null, INITIAL_ARRAY);
+    var maxVal = Math.max.apply(null, INITIAL_ARRAY);
+    if (maxVal === minVal) return (MIN_HEIGHT + MAX_HEIGHT) / 2;
+    return MIN_HEIGHT + ((value - minVal) / (maxVal - minVal)) * (MAX_HEIGHT - MIN_HEIGHT);
+  }
+
+  function generateSteps() {
+    var arr = INITIAL_ARRAY.slice();
+    var n = arr.length;
+    var result = [];
+    var sorted = [];
+
+    // Initial state
+    result.push({
+      array: arr.slice(),
+      comparing: [],
+      swapped: false,
+      sorted: [],
+      explanation: 'Initial array — ready to begin bubble sort'
+    });
+
+    for (var pass = 0; pass < n - 1; pass++) {
+      var swappedInPass = false;
+      for (var j = 0; j < n - 1 - pass; j++) {
+        // Comparison step
+        var didSwap = arr[j] > arr[j + 1];
+        if (didSwap) {
+          // Show comparison with swap
+          result.push({
+            array: arr.slice(),
+            comparing: [j, j + 1],
+            swapped: true,
+            sorted: sorted.slice(),
+            explanation: 'Comparing ' + arr[j] + ' and ' + arr[j + 1] + ' \u2014 ' + arr[j] + ' > ' + arr[j + 1] + ', swapping'
+          });
+          // Perform the swap
+          var temp = arr[j];
+          arr[j] = arr[j + 1];
+          arr[j + 1] = temp;
+          swappedInPass = true;
+        } else {
+          result.push({
+            array: arr.slice(),
+            comparing: [j, j + 1],
+            swapped: false,
+            sorted: sorted.slice(),
+            explanation: 'Comparing ' + arr[j] + ' and ' + arr[j + 1] + ' \u2014 ' + arr[j] + ' \u2264 ' + arr[j + 1] + ', no swap needed'
+          });
+        }
+      }
+
+      // Mark the element at position n-1-pass as sorted
+      sorted.push(n - 1 - pass);
+
+      // Pass complete explanation
+      result.push({
+        array: arr.slice(),
+        comparing: [],
+        swapped: false,
+        sorted: sorted.slice(),
+        explanation: 'Pass ' + (pass + 1) + ' complete \u2014 ' + arr[n - 1 - pass] + ' is now in its final position'
+      });
+
+      if (!swappedInPass) break;
+    }
+
+    // Mark all remaining elements as sorted
+    var allSorted = [];
+    for (var k = 0; k < n; k++) allSorted.push(k);
+    result.push({
+      array: arr.slice(),
+      comparing: [],
+      swapped: false,
+      sorted: allSorted,
+      explanation: 'Sorting complete! Array is fully sorted.'
+    });
+
+    return result;
+  }
+
+  function getBarClasses(index, step) {
+    var base = 'bubble-sort-bar flex flex-col items-center justify-end w-10 rounded-md transition-all duration-300';
+
+    if (step.sorted.indexOf(index) !== -1) {
+      return base + ' border-2 border-cyan-400 bg-cyan-500/10';
+    }
+    if (step.comparing.indexOf(index) !== -1) {
+      return base + ' border-2 border-indigo-500 bg-indigo-500/10';
+    }
+    return base + ' border border-[#1e2330] bg-[#13161e]';
+  }
+
+  function renderBars(step) {
+    var arr = step.array;
+    var fragment = document.createDocumentFragment();
+
+    for (var i = 0; i < arr.length; i++) {
+      var bar = document.createElement('div');
+      bar.className = getBarClasses(i, step);
+      var h = Math.round(computeBarHeight(arr[i]));
+      bar.style.height = h + 'px';
+
+      var label = document.createElement('span');
+      label.className = 'text-xs font-mono text-atlas-muted mt-1 mb-1';
+      label.textContent = arr[i];
+      bar.appendChild(label);
+
+      fragment.appendChild(bar);
+    }
+
+    barsContainer.innerHTML = '';
+    barsContainer.appendChild(fragment);
+  }
+
+  function updateUI() {
+    var step = steps[currentStep] || steps[0];
+    explanationEl.textContent = step.explanation;
+    counterEl.textContent = 'Step ' + Math.max(currentStep, 0) + ' / ' + (steps.length - 1);
+
+    // Update bar heights and classes with requestAnimationFrame for smooth transition
+    var existingBars = barsContainer.querySelectorAll('.bubble-sort-bar');
+    if (existingBars.length === step.array.length) {
+      requestAnimationFrame(function() {
+        for (var i = 0; i < step.array.length; i++) {
+          var bar = existingBars[i];
+          var h = Math.round(computeBarHeight(step.array[i]));
+          bar.style.height = h + 'px';
+          bar.className = getBarClasses(i, step);
+          var label = bar.querySelector('span');
+          if (label) label.textContent = step.array[i];
+        }
+      });
+    } else {
+      renderBars(step);
+    }
+  }
+
+  function advanceStep() {
+    if (currentStep >= steps.length - 1) {
+      stopPlaying();
+      return;
+    }
+    currentStep++;
+    updateUI();
+    if (currentStep >= steps.length - 1) {
+      stopPlaying();
+    }
+  }
+
+  function startPlaying() {
+    if (prefersReducedMotion) return;
+    if (currentStep >= steps.length - 1) {
+      resetViz();
+    }
+    isPlaying = true;
+    playBtn.textContent = 'Pause';
+    stepBtn.classList.add('opacity-40', 'pointer-events-none');
+    scheduleNext();
+  }
+
+  function stopPlaying() {
+    isPlaying = false;
+    playBtn.textContent = 'Play';
+    stepBtn.classList.remove('opacity-40', 'pointer-events-none');
+    if (playTimer) {
+      clearTimeout(playTimer);
+      playTimer = null;
+    }
+  }
+
+  function scheduleNext() {
+    if (!isPlaying) return;
+    var speed = parseInt(speedSelect.value, 10) || 600;
+    playTimer = setTimeout(function() {
+      if (!isPlaying) return;
+      advanceStep();
+      if (isPlaying) scheduleNext();
+    }, speed);
+  }
+
+  function resetViz() {
+    stopPlaying();
+    currentStep = 0;
+    renderBars(steps[0]);
+    updateUI();
+  }
+
+  // Initialize
+  steps = generateSteps();
+  currentStep = 0;
+  renderBars(steps[0]);
+  updateUI();
+
+  // Event listeners
+  playBtn.addEventListener('click', function() {
+    if (isPlaying) {
+      stopPlaying();
+    } else {
+      startPlaying();
+    }
+  });
+
+  stepBtn.addEventListener('click', function() {
+    if (!isPlaying) {
+      advanceStep();
+    }
+  });
+
+  resetBtn.addEventListener('click', function() {
+    resetViz();
+  });
+
+  speedSelect.addEventListener('change', function() {
+    if (isPlaying) {
+      if (playTimer) clearTimeout(playTimer);
+      scheduleNext();
+    }
+  });
+
+  // prefers-reduced-motion: hide play button, only allow stepping
+  if (prefersReducedMotion) {
+    playBtn.style.display = 'none';
+    speedSelect.style.display = 'none';
+  }
+})();
+</script>

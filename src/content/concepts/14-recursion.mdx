@@ -1,0 +1,119 @@
+---
+title: "Recursion"
+titleEs: "Recursión"
+description: "A function that calls itself. Master the base case, the recursive case, and the call stack."
+descriptionEs: "Una función que se llama a sí misma. Domina el caso base, el caso recursivo y la pila de llamadas."
+order: 14
+section: "algorithms"
+level: "intermediate"
+estimatedMinutes: 10
+tags: ["algorithms", "recursion", "factorial", "fibonacci"]
+hasAnimation: true
+publishedAt: 2024-01-14
+relatedConcepts: ["13-binary-search", "07-linked-lists"]
+---
+import RecursionVisualizer from '../../components/animations/RecursionVisualizer.astro';
+
+## What It Is
+
+**Recursion** is when a function calls itself. Every recursive function needs two things:
+
+1. **Base case** — the condition that stops the recursion
+2. **Recursive case** — the step that moves toward the base case
+
+Without a base case, the function calls itself forever until it crashes.
+
+## Real-World Analogy
+
+Think of Russian nesting dolls (Matryoshka). To open the whole set, you open the outer doll, then open the inner doll (same action), then the next inner one — until you reach the smallest doll that doesn't open. That smallest doll is the **base case**.
+
+## See the Call Stack in Action
+
+<RecursionVisualizer />
+
+## Factorial — The Classic Example
+
+```python
+def factorial(n):
+    if n == 0:       # base case
+        return 1
+    return n * factorial(n - 1)  # recursive case
+
+print(factorial(5))  # 120
+# 5 * 4 * 3 * 2 * 1 * 1 = 120
+```
+
+Each call waits for the next one to return before it can compute its own result.
+
+## How the Call Stack Works
+
+When `factorial(4)` runs, each call is placed on the **call stack** — a stack of function calls waiting to complete:
+
+```
+factorial(4) → 4 * factorial(3)
+  factorial(3) → 3 * factorial(2)
+    factorial(2) → 2 * factorial(1)
+      factorial(1) → 1 * factorial(0)
+        factorial(0) → 1  ← base case hit!
+      returns 1 * 1 = 1
+    returns 2 * 1 = 2
+  returns 3 * 2 = 6
+returns 4 * 6 = 24
+```
+
+The stack **unwinds** — calls return in reverse order, each using the result from the call below it.
+
+## Fibonacci — Double Recursion
+
+```python
+def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+for i in range(8):
+    print(fibonacci(i), end=" ")
+# 0 1 1 2 3 5 8 13
+```
+
+Each call branches into **two** recursive calls, creating a tree of computations. This is simple but inefficient — `fibonacci(30)` makes over a million function calls. Memoization or iteration can fix this.
+
+## Common Mistake: Missing Base Case
+
+Without a base case, recursion never stops:
+
+```python
+def infinite(n):
+    return n * infinite(n - 1)  # no base case!
+
+infinite(5)
+# RecursionError: maximum recursion depth exceeded
+```
+
+Python limits recursion depth to ~1000 calls by default. Always define a clear base case that the recursive case converges toward.
+
+## Recursion vs Iteration
+
+Any recursive algorithm can be rewritten iteratively (with a loop), and vice versa. The choice depends on clarity and performance:
+
+| | Recursion | Iteration |
+|---|---|---|
+| Code clarity | Often cleaner for tree-like problems | Better for simple loops |
+| Memory | Uses stack space (O(n) for depth n) | Usually O(1) |
+| Speed | Function call overhead | Generally faster |
+| Best for | Trees, graphs, divide-and-conquer | Sequential processing |
+
+## When to Use Recursion
+
+Recursion is the natural choice for problems with a **recursive structure**:
+
+- **Tree traversal** — visiting every node in a tree
+- **Divide and conquer** — merge sort, quicksort, binary search
+- **Nested data** — file systems, JSON parsing, HTML DOM
+- **Mathematical definitions** — factorial, Fibonacci, power
+
+If the problem can be broken into smaller versions of itself, recursion is often the clearest solution.
+
+## What's Next?
+
+You've now covered the foundational algorithms: three sorting methods, two search techniques, and recursion. These building blocks appear everywhere in computer science — from database engines to web frameworks to AI systems. Keep practicing by implementing them from memory.

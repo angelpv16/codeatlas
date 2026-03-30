@@ -1,0 +1,121 @@
+---
+title: "Binary Search"
+titleEs: "Búsqueda Binaria"
+description: "Halve the search space with every step. The fastest way to find an element in a sorted array."
+descriptionEs: "Reduce el espacio de búsqueda a la mitad en cada paso. La forma más rápida de encontrar un elemento en un array ordenado."
+order: 13
+section: "algorithms"
+level: "intermediate"
+estimatedMinutes: 8
+tags: ["algorithms", "searching", "binary-search"]
+hasAnimation: true
+publishedAt: 2024-01-13
+relatedConcepts: ["12-linear-search", "05-arrays-and-lists"]
+---
+import BinarySearchVisualizer from '../../components/animations/BinarySearchVisualizer.astro';
+
+## What It Does
+
+**Binary search** works on a **sorted** array by repeatedly halving the search space. Compare the target to the middle element: if equal, done. If the target is smaller, search the left half. If larger, search the right half. Repeat until found or the range is empty.
+
+## Real-World Analogy
+
+Think of looking up a word in a physical dictionary. You open to the middle — if your word comes before that page, you search the left half. If after, the right half. You never go back to pages you've already eliminated. Each step cuts the remaining pages in half.
+
+## Key Requirement
+
+The array **must be sorted**. Binary search on an unsorted array produces incorrect results. Always sort first, or use linear search on unsorted data.
+
+## See It in Action
+
+<BinarySearchVisualizer />
+
+## Python Implementation
+
+```python
+def binary_search(arr, target):
+    left, right = 0, len(arr) - 1
+
+    while left <= right:
+        mid = (left + right) // 2
+
+        if arr[mid] == target:
+            return mid          # found
+        elif arr[mid] < target:
+            left = mid + 1      # search right half
+        else:
+            right = mid - 1     # search left half
+
+    return -1                   # not found
+
+numbers = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]
+print(binary_search(numbers, 23))   # 5
+print(binary_search(numbers, 10))   # -1
+```
+
+Three pointers drive the algorithm: `left` and `right` define the current search range, and `mid` is calculated each iteration as the midpoint.
+
+## The Power of Halving
+
+Each step eliminates half the remaining elements. This adds up fast:
+
+| Array Size | Max Comparisons |
+|-----------|----------------|
+| 10 | 4 |
+| 100 | 7 |
+| 1,000 | 10 |
+| 1,000,000 | 20 |
+| 1,000,000,000 | 30 |
+
+A sorted array of **one billion** elements needs at most **30 comparisons**. Linear search on the same array could need up to one billion.
+
+## Time & Space Complexity
+
+| Case | Time | Why |
+|------|------|-----|
+| Best | O(1) | Target is the middle element |
+| Average | O(log n) | Halves the range each step |
+| Worst | O(log n) | Target not found, range fully narrowed |
+
+**Space complexity:** O(1) for the iterative version. A recursive version uses O(log n) stack space.
+
+## Common Mistakes
+
+**1. Using binary search on unsorted data:**
+```python
+# Wrong — array is not sorted!
+arr = [5, 2, 8, 1, 9]
+binary_search(arr, 2)  # may return -1 (incorrect)
+```
+
+**2. Integer overflow with midpoint calculation** (not an issue in Python, but critical in C/Java):
+```python
+# Safe in Python (arbitrary precision integers)
+mid = (left + right) // 2
+
+# In C/Java, use this to avoid overflow:
+# mid = left + (right - left) / 2
+```
+
+**3. Off-by-one errors with bounds:**
+```python
+# Wrong — using < instead of <= misses single-element ranges
+while left < right:
+
+# Correct — includes the case where left == right
+while left <= right:
+```
+
+## When to Use It
+
+Binary search is ideal when:
+
+- The array is **sorted** (or you can sort it once and search many times)
+- The array is **large** — the O(log n) advantage grows with size
+- You need to search **repeatedly** — amortize the sorting cost
+
+If you only search once and the array is unsorted, sorting + binary search is O(n log n) — worse than linear search's O(n).
+
+## What's Next?
+
+Binary search is a divide-and-conquer algorithm — it breaks a problem into smaller subproblems. This pattern is powered by **Recursion**, where a function calls itself to solve progressively smaller instances of the same problem.

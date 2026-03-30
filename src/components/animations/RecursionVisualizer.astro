@@ -1,0 +1,364 @@
+---
+// Interactive recursion (factorial) call stack visualization with step-by-step playback
+---
+<div id="recursion-viz" class="bg-[#0a0c12] border border-[#1e2330] rounded-xl p-6 my-8 not-prose select-none">
+  <!-- Title and n input -->
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+    <p class="text-xs font-mono text-atlas-muted opacity-70">factorial(n) — call stack</p>
+    <div class="flex items-center gap-2">
+      <label for="recursion-n-input" class="text-xs font-mono text-atlas-muted">n =</label>
+      <input
+        id="recursion-n-input"
+        type="range"
+        min="1"
+        max="7"
+        value="5"
+        class="w-24 h-1 accent-atlas-accent bg-atlas-border rounded-lg appearance-none cursor-pointer"
+      />
+      <span id="recursion-n-display" class="text-xs font-mono text-atlas-text w-4 text-center">5</span>
+    </div>
+  </div>
+
+  <!-- Step explanation panel -->
+  <div class="mb-4 min-h-[2.5rem] flex items-center justify-center">
+    <p id="recursion-explanation" class="text-sm font-mono text-atlas-muted-2 text-center leading-relaxed">&nbsp;</p>
+  </div>
+
+  <!-- Call stack area -->
+  <div id="recursion-stack" class="flex flex-col gap-2 min-h-[4rem] mb-4"></div>
+
+  <!-- Controls bar -->
+  <div class="flex flex-wrap items-center justify-center gap-3">
+    <button
+      id="recursion-play"
+      class="px-3 py-1.5 text-xs font-mono bg-atlas-accent/10 text-atlas-accent rounded-md hover:bg-atlas-accent/20 transition-colors"
+      aria-label="Play or Pause"
+    >
+      Play
+    </button>
+    <button
+      id="recursion-step"
+      class="px-3 py-1.5 text-xs font-mono bg-atlas-border text-atlas-muted rounded-md hover:text-atlas-text transition-colors"
+      aria-label="Step forward"
+    >
+      Step
+    </button>
+    <button
+      id="recursion-reset"
+      class="px-3 py-1.5 text-xs font-mono bg-atlas-border text-atlas-muted rounded-md hover:text-atlas-text transition-colors"
+      aria-label="Reset"
+    >
+      Reset
+    </button>
+    <select
+      id="recursion-speed"
+      class="px-2 py-1.5 text-xs font-mono bg-atlas-surface border border-atlas-border text-atlas-muted rounded-md focus:outline-none focus:border-atlas-accent appearance-none cursor-pointer"
+    >
+      <option value="1200">Slow</option>
+      <option value="600" selected>Normal</option>
+      <option value="250">Fast</option>
+    </select>
+    <span id="recursion-counter" class="text-xs font-mono text-atlas-muted opacity-60">Step 0 / 0</span>
+  </div>
+</div>
+
+<script is:inline>
+(function() {
+  var stackContainer = document.getElementById('recursion-stack');
+  var explanationEl = document.getElementById('recursion-explanation');
+  var playBtn = document.getElementById('recursion-play');
+  var stepBtn = document.getElementById('recursion-step');
+  var resetBtn = document.getElementById('recursion-reset');
+  var speedSelect = document.getElementById('recursion-speed');
+  var counterEl = document.getElementById('recursion-counter');
+  var nInput = document.getElementById('recursion-n-input');
+  var nDisplay = document.getElementById('recursion-n-display');
+
+  if (!stackContainer || !explanationEl || !playBtn || !stepBtn || !resetBtn || !speedSelect || !counterEl || !nInput || !nDisplay) return;
+
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var currentN = 5;
+  var steps = [];
+  var currentStep = -1;
+  var isPlaying = false;
+  var playTimer = null;
+
+  // Pre-compute factorial values for quick lookup
+  function factorial(n) {
+    if (n <= 1) return 1;
+    var result = 1;
+    for (var i = 2; i <= n; i++) {
+      result *= i;
+    }
+    return result;
+  }
+
+  // Generate all steps for both phases
+  function generateSteps(n) {
+    var result = [];
+
+    // Phase 1: Unwinding — frames being pushed onto the stack
+    // Each step adds one call frame, from factorial(n) down to factorial(1), then factorial(0)
+    for (var i = n; i >= 1; i--) {
+      var frames = [];
+      for (var j = n; j >= i; j--) {
+        frames.push({
+          n: j,
+          state: j === i ? 'active' : 'waiting',
+          label: 'factorial(' + j + ')',
+          detail: j === i
+            ? 'waiting for factorial(' + (j - 1) + ')...'
+            : 'waiting for factorial(' + (j - 1) + ')...'
+        });
+      }
+      var explanation = i > 0
+        ? 'Calling factorial(' + i + ') \u2014 needs factorial(' + (i - 1) + ') first'
+        : '';
+      result.push({ frames: frames, explanation: explanation });
+    }
+
+    // Base case step: factorial(0) is pushed and immediately resolved
+    var baseFrames = [];
+    for (var j = n; j >= 1; j--) {
+      baseFrames.push({
+        n: j,
+        state: 'waiting',
+        label: 'factorial(' + j + ')',
+        detail: 'waiting for factorial(' + (j - 1) + ')...'
+      });
+    }
+    baseFrames.push({
+      n: 0,
+      state: 'active',
+      label: 'factorial(0)',
+      detail: '= 1'
+    });
+    result.push({
+      frames: baseFrames,
+      explanation: 'factorial(0) = 1 \u2014 base case reached! Starting to return'
+    });
+
+    // Phase 2: Returning — resolving from bottom (factorial(0)) up to factorial(n)
+    // Start resolving from factorial(1) upward since factorial(0) was just resolved
+    for (var r = 0; r <= n; r++) {
+      var returnFrames = [];
+      var returnValue = factorial(r);
+      var prevValue = r > 0 ? factorial(r - 1) : 1;
+
+      // Build the stack for this returning step
+      // Top of stack (highest n) down to current returning frame
+      for (var j = n; j >= 0; j--) {
+        if (j > r) {
+          // Still waiting (above the returning frame)
+          returnFrames.push({
+            n: j,
+            state: 'waiting',
+            label: 'factorial(' + j + ')',
+            detail: 'waiting for factorial(' + (j - 1) + ')...'
+          });
+        } else if (j === r) {
+          // Currently returning
+          returnFrames.push({
+            n: j,
+            state: 'returning',
+            label: 'factorial(' + j + ')',
+            detail: '= ' + returnValue
+          });
+        } else {
+          // Already resolved (below current)
+          returnFrames.push({
+            n: j,
+            state: 'returning',
+            label: 'factorial(' + j + ')',
+            detail: '= ' + factorial(j)
+          });
+        }
+      }
+
+      var explanation;
+      if (r === 0) {
+        explanation = 'factorial(0) = 1 \u2014 returning up the stack';
+      } else if (r === n) {
+        explanation = 'factorial(' + r + ') = ' + r + ' \u00d7 ' + prevValue + ' = ' + returnValue + ' \u2014 done!';
+      } else {
+        explanation = 'factorial(' + r + ') = ' + r + ' \u00d7 ' + prevValue + ' = ' + returnValue + ' \u2014 returning up the stack';
+      }
+
+      result.push({ frames: returnFrames, explanation: explanation });
+    }
+
+    return result;
+  }
+
+  function getFrameClasses(state) {
+    var base = 'recursion-frame px-4 py-2.5 rounded-lg font-mono text-sm transition-all duration-300';
+    if (state === 'active') {
+      return base + ' border-2 border-indigo-500 bg-indigo-500/10';
+    }
+    if (state === 'returning') {
+      return base + ' border-2 border-cyan-400 bg-cyan-500/10';
+    }
+    return base + ' border border-[#1e2330] bg-[#13161e]';
+  }
+
+  function renderStack(step) {
+    var fragment = document.createDocumentFragment();
+    var frames = step.frames;
+
+    // Frames are ordered top-first (highest n at index 0), render top to bottom
+    for (var i = 0; i < frames.length; i++) {
+      var frame = frames[i];
+      var div = document.createElement('div');
+      div.className = getFrameClasses(frame.state);
+
+      if (!prefersReducedMotion) {
+        div.style.opacity = '0';
+        div.style.transform = 'translateY(-6px)';
+      }
+
+      var labelSpan = document.createElement('span');
+      labelSpan.className = frame.state === 'returning'
+        ? 'text-cyan-300'
+        : frame.state === 'active'
+          ? 'text-indigo-300'
+          : 'text-atlas-text';
+      labelSpan.textContent = frame.label;
+
+      var detailSpan = document.createElement('span');
+      detailSpan.className = frame.state === 'returning'
+        ? 'text-cyan-400/80 ml-2'
+        : 'text-atlas-muted ml-2';
+      detailSpan.textContent = frame.detail;
+
+      div.appendChild(labelSpan);
+      div.appendChild(detailSpan);
+      fragment.appendChild(div);
+    }
+
+    stackContainer.innerHTML = '';
+    stackContainer.appendChild(fragment);
+
+    // Animate frames in
+    if (!prefersReducedMotion) {
+      var frameEls = stackContainer.querySelectorAll('.recursion-frame');
+      for (var k = 0; k < frameEls.length; k++) {
+        (function(el, delay) {
+          setTimeout(function() {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+          }, delay);
+        })(frameEls[k], k * 40);
+      }
+    }
+  }
+
+  function updateUI() {
+    var step = steps[currentStep] || steps[0];
+    explanationEl.textContent = step.explanation;
+    counterEl.textContent = 'Step ' + Math.max(currentStep + 1, 1) + ' / ' + steps.length;
+
+    renderStack(step);
+  }
+
+  function advanceStep() {
+    if (currentStep >= steps.length - 1) {
+      stopPlaying();
+      return;
+    }
+    currentStep++;
+    updateUI();
+    if (currentStep >= steps.length - 1) {
+      stopPlaying();
+    }
+  }
+
+  function startPlaying() {
+    if (prefersReducedMotion) return;
+    if (currentStep >= steps.length - 1) {
+      resetViz();
+    }
+    isPlaying = true;
+    playBtn.textContent = 'Pause';
+    stepBtn.classList.add('opacity-40', 'pointer-events-none');
+    scheduleNext();
+  }
+
+  function stopPlaying() {
+    isPlaying = false;
+    playBtn.textContent = 'Play';
+    stepBtn.classList.remove('opacity-40', 'pointer-events-none');
+    if (playTimer) {
+      clearTimeout(playTimer);
+      playTimer = null;
+    }
+  }
+
+  function scheduleNext() {
+    if (!isPlaying) return;
+    var speed = parseInt(speedSelect.value, 10) || 600;
+    playTimer = setTimeout(function() {
+      if (!isPlaying) return;
+      advanceStep();
+      if (isPlaying) scheduleNext();
+    }, speed);
+  }
+
+  function resetViz() {
+    stopPlaying();
+    currentStep = 0;
+    updateUI();
+  }
+
+  function initWithN(n) {
+    stopPlaying();
+    currentN = n;
+    steps = generateSteps(n);
+    currentStep = 0;
+    updateUI();
+  }
+
+  // Initialize
+  initWithN(currentN);
+
+  // Event listeners
+  playBtn.addEventListener('click', function() {
+    if (isPlaying) {
+      stopPlaying();
+    } else {
+      startPlaying();
+    }
+  });
+
+  stepBtn.addEventListener('click', function() {
+    if (!isPlaying) {
+      advanceStep();
+    }
+  });
+
+  resetBtn.addEventListener('click', function() {
+    resetViz();
+  });
+
+  speedSelect.addEventListener('change', function() {
+    if (isPlaying) {
+      if (playTimer) clearTimeout(playTimer);
+      scheduleNext();
+    }
+  });
+
+  nInput.addEventListener('input', function() {
+    var val = parseInt(nInput.value, 10);
+    if (val >= 1 && val <= 7) {
+      nDisplay.textContent = val;
+      initWithN(val);
+    }
+  });
+
+  // prefers-reduced-motion: disable auto-play, show only Step button
+  if (prefersReducedMotion) {
+    playBtn.style.display = 'none';
+    speedSelect.style.display = 'none';
+  }
+})();
+</script>

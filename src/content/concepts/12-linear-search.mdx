@@ -1,0 +1,99 @@
+---
+title: "Linear Search"
+titleEs: "Búsqueda Lineal"
+description: "The simplest search algorithm — check each element one by one until you find the target or reach the end."
+descriptionEs: "El algoritmo de búsqueda más simple — revisa cada elemento uno por uno hasta encontrar el objetivo o llegar al final."
+order: 12
+section: "algorithms"
+level: "beginner"
+estimatedMinutes: 6
+tags: ["algorithms", "searching", "linear-search"]
+hasAnimation: true
+publishedAt: 2024-01-12
+relatedConcepts: ["13-binary-search", "05-arrays-and-lists"]
+---
+import LinearSearchVisualizer from '../../components/animations/LinearSearchVisualizer.astro';
+
+## What It Does
+
+**Linear search** checks each element one by one from left to right until it finds the target value or reaches the end of the array. If the target is found, it returns the index. If not, it returns -1.
+
+It's the simplest search algorithm — no prerequisites, no sorting required.
+
+## Real-World Analogy
+
+Imagine looking for your keys by checking every drawer and pocket one by one, in no particular order. You start at the first one and work your way through until you find them — or run out of places to look.
+
+## See It in Action
+
+<LinearSearchVisualizer />
+
+## Python Implementation
+
+```python
+def linear_search(arr, target):
+    for i in range(len(arr)):
+        if arr[i] == target:
+            return i   # found at index i
+    return -1          # not found
+
+fruits = ["apple", "banana", "cherry", "mango", "kiwi"]
+print(linear_search(fruits, "cherry"))  # 2
+print(linear_search(fruits, "grape"))   # -1
+```
+
+The function walks through every element. As soon as it finds a match, it returns immediately — no need to check the rest.
+
+## Time & Space Complexity
+
+| Case | Time | Why |
+|------|------|-----|
+| Best | O(1) | Target is the first element |
+| Average | O(n) | Target is somewhere in the middle |
+| Worst | O(n) | Target is last or not present |
+
+**Space complexity:** O(1) — no extra memory needed.
+
+## When to Use It
+
+Linear search is the right choice when:
+
+- The array is **small** — the simplicity outweighs the inefficiency
+- The array is **unsorted** — you can't use binary search on unsorted data
+- You only need to search **once** — sorting first would be slower overall
+- You're searching a **linked list** — you can't jump to the middle anyway
+
+## Linear Search vs Binary Search
+
+| | Linear Search | Binary Search |
+|---|---|---|
+| Requires sorted array? | No | Yes |
+| Time complexity | O(n) | O(log n) |
+| 1,000,000 elements | Up to 1,000,000 checks | At most 20 checks |
+| Simplicity | Very simple | Slightly more complex |
+
+For large sorted arrays, binary search is dramatically faster. But if the data isn't sorted, linear search is your only option (without sorting first).
+
+## Common Mistake
+
+Forgetting to handle the "not found" case. Always return a sentinel value (like -1) or raise an exception when the target isn't in the array:
+
+```python
+# Incomplete — what if target isn't found?
+def bad_search(arr, target):
+    for i in range(len(arr)):
+        if arr[i] == target:
+            return i
+    # Falls off the end — returns None implicitly
+
+# Complete — explicit "not found" return
+def good_search(arr, target):
+    for i in range(len(arr)):
+        if arr[i] == target:
+            return i
+    return -1
+```
+
+## What's Next?
+
+Linear search checks every element. But if the array is sorted, we can do much better. **Binary Search** halves the search space with every comparison, finding elements in O(log n) time.

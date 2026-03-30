@@ -66,6 +66,8 @@
   "map.filterAll": "Todo",
   "map.filterFundamentals": "Fundamentos",
   "map.filterDSA": "DSA",
+  "section.algorithms": "Algoritmos",
+  "map.filterAlgorithms": "Algoritmos",
   "lang.en": "EN",
   "lang.es": "ES"
 }

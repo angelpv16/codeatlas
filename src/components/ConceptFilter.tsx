@@ -7,7 +7,7 @@ interface Concept {
   description: string;
   descriptionEs: string;
   level: 'beginner' | 'intermediate' | 'advanced';
-  section: 'fundamentals' | 'dsa';
+  section: 'fundamentals' | 'dsa' | 'algorithms';
   estimatedMinutes: number;
   order: number;
 }
@@ -23,8 +23,8 @@ const levelLabels = {
 };
 
 const sectionLabels = {
-  en: { all: 'All', fundamentals: 'Fundamentals', dsa: 'DSA' },
-  es: { all: 'Todo', fundamentals: 'Fundamentos', dsa: 'DSA' },
+  en: { all: 'All', fundamentals: 'Fundamentals', dsa: 'DSA', algorithms: 'Algorithms' },
+  es: { all: 'Todo', fundamentals: 'Fundamentos', dsa: 'DSA', algorithms: 'Algoritmos' },
 };
 
 const badgeClasses: Record<string, string> = {
@@ -57,6 +57,7 @@ export default function ConceptFilter({ concepts, lang = 'en' }: ConceptFilterPr
     { key: 'all', label: secLabels.all },
     { key: 'fundamentals', label: secLabels.fundamentals },
     { key: 'dsa', label: secLabels.dsa },
+    { key: 'algorithms', label: secLabels.algorithms },
   ];
 
   const levelFilters = [
@@ -105,7 +106,7 @@ export default function ConceptFilter({ concepts, lang = 'en' }: ConceptFilterPr
             const displayDesc = lang === 'es' ? concept.descriptionEs : concept.description;
             const badgeClass = badgeClasses[concept.level] || '';
             const levelLabel = labels[concept.level as keyof typeof labels] || concept.level;
-            const sectionTag = concept.section === 'dsa' ? 'DSA' : (lang === 'es' ? 'Fundamentos' : 'Fundamentals');
+            const sectionTag = concept.section === 'dsa' ? 'DSA' : concept.section === 'algorithms' ? (lang === 'es' ? 'Algoritmos' : 'Algorithms') : (lang === 'es' ? 'Fundamentos' : 'Fundamentals');
 
             return (
               <a

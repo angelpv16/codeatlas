@@ -1,0 +1,367 @@
+---
+// Interactive insertion sort visualization for the Sorting Algorithms concept
+---
+<div class="bg-[#0a0c12] border border-[#1e2330] rounded-xl p-6 my-8 not-prose select-none" id="insertion-sort-container">
+  <!-- Title -->
+  <p class="text-xs font-mono text-atlas-accent mb-4 font-semibold tracking-wide uppercase">
+    Insertion Sort
+  </p>
+
+  <!-- Visual area: bars -->
+  <div id="insertion-sort-bars" class="h-56 flex items-end justify-center gap-3 mb-4">
+    <!-- Bars rendered by JS -->
+  </div>
+
+  <!-- Step explanation panel -->
+  <div class="mb-4 min-h-[2rem] flex items-center">
+    <p id="insertion-sort-explanation" class="text-sm font-mono text-atlas-muted-2">
+      Press Play or Step to begin.
+    </p>
+  </div>
+
+  <!-- Controls bar -->
+  <div class="flex flex-wrap items-center gap-3">
+    <!-- Play / Pause -->
+    <button
+      id="insertion-sort-play"
+      class="px-3 py-1.5 text-xs font-mono bg-atlas-accent/10 text-atlas-accent rounded-md hover:bg-atlas-accent/20 transition-colors"
+      aria-label="Play or pause auto-stepping"
+    >
+      Play
+    </button>
+
+    <!-- Step -->
+    <button
+      id="insertion-sort-step"
+      class="px-3 py-1.5 text-xs font-mono bg-atlas-border text-atlas-muted rounded-md hover:text-atlas-text transition-colors"
+      aria-label="Advance one step"
+    >
+      Step
+    </button>
+
+    <!-- Reset -->
+    <button
+      id="insertion-sort-reset"
+      class="px-3 py-1.5 text-xs font-mono bg-atlas-border text-atlas-muted rounded-md hover:text-atlas-text transition-colors"
+      aria-label="Reset to initial state"
+    >
+      Reset
+    </button>
+
+    <!-- Speed selector -->
+    <select
+      id="insertion-sort-speed"
+      class="px-2 py-1.5 text-xs font-mono bg-atlas-surface border border-atlas-border rounded-md text-atlas-muted focus:outline-none focus:border-atlas-accent"
+      aria-label="Playback speed"
+    >
+      <option value="1200">Slow</option>
+      <option value="600" selected>Normal</option>
+      <option value="250">Fast</option>
+    </select>
+
+    <!-- Step counter -->
+    <span id="insertion-sort-counter" class="ml-auto text-xs font-mono text-atlas-muted">
+      Step 0 / 0
+    </span>
+  </div>
+</div>
+
+<script is:inline>
+(function () {
+  // --- Prefers reduced motion ---
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // --- DOM references ---
+  var barsContainer = document.getElementById('insertion-sort-bars');
+  var explanationEl = document.getElementById('insertion-sort-explanation');
+  var playBtn = document.getElementById('insertion-sort-play');
+  var stepBtn = document.getElementById('insertion-sort-step');
+  var resetBtn = document.getElementById('insertion-sort-reset');
+  var speedSelect = document.getElementById('insertion-sort-speed');
+  var counterEl = document.getElementById('insertion-sort-counter');
+
+  if (!barsContainer || !explanationEl || !playBtn || !stepBtn || !resetBtn || !speedSelect || !counterEl) return;
+
+  // --- Constants ---
+  var INITIAL_ARRAY = [9, 5, 1, 8, 3, 7, 4];
+  var MIN_HEIGHT = 20;
+  var MAX_HEIGHT = 140;
+  var MAX_VAL = 9;
+  var MIN_VAL = 1;
+
+  // --- Pre-compute all steps ---
+  // Step types: 'take_key', 'shift', 'insert'
+  // Each step: { type, array (snapshot after), keyIndex, keyValue, shiftFrom?, explanation, sorted (indices considered sorted) }
+  function computeSteps(arr) {
+    var steps = [];
+    var a = arr.slice();
+
+    // Initial state
+    steps.push({
+      type: 'initial',
+      array: a.slice(),
+      keyIndex: -1,
+      keyValue: -1,
+      shiftFrom: -1,
+      explanation: 'Initial array. Press Play or Step to begin.',
+      sorted: [0],
+      highlightKey: -1,
+      highlightShift: -1
+    });
+
+    for (var i = 1; i < a.length; i++) {
+      var key = a[i];
+      var j = i - 1;
+
+      // Step: taking the key
+      steps.push({
+        type: 'take_key',
+        array: a.slice(),
+        keyIndex: i,
+        keyValue: key,
+        shiftFrom: -1,
+        explanation: 'Taking ' + key + ' (index ' + i + ') as the key to insert',
+        sorted: sortedRange(i),
+        highlightKey: i,
+        highlightShift: -1
+      });
+
+      // Steps: shifting
+      while (j >= 0 && a[j] > key) {
+        steps.push({
+          type: 'shift',
+          array: a.slice(),
+          keyIndex: i,
+          keyValue: key,
+          shiftFrom: j,
+          explanation: a[j] + ' > ' + key + ' \u2014 shifting ' + a[j] + ' one position right',
+          sorted: sortedRange(i),
+          highlightKey: i,
+          highlightShift: j
+        });
+
+        a[j + 1] = a[j];
+        j--;
+      }
+
+      // Step: insert
+      a[j + 1] = key;
+      var insertPos = j + 1;
+      steps.push({
+        type: 'insert',
+        array: a.slice(),
+        keyIndex: insertPos,
+        keyValue: key,
+        shiftFrom: -1,
+        explanation: 'Inserting ' + key + ' at index ' + insertPos,
+        sorted: sortedRange(i + 1),
+        highlightKey: insertPos,
+        highlightShift: -1
+      });
+    }
+
+    // Final sorted step
+    steps.push({
+      type: 'done',
+      array: a.slice(),
+      keyIndex: -1,
+      keyValue: -1,
+      shiftFrom: -1,
+      explanation: 'Array is now fully sorted!',
+      sorted: sortedRange(a.length),
+      highlightKey: -1,
+      highlightShift: -1
+    });
+
+    return steps;
+  }
+
+  function sortedRange(n) {
+    var r = [];
+    for (var i = 0; i < n; i++) r.push(i);
+    return r;
+  }
+
+  // --- State ---
+  var steps = computeSteps(INITIAL_ARRAY);
+  var currentStep = 0;
+  var playing = false;
+  var timerId = null;
+
+  // --- Rendering ---
+  function barHeight(value) {
+    return MIN_HEIGHT + ((value - MIN_VAL) / (MAX_VAL - MIN_VAL)) * (MAX_HEIGHT - MIN_HEIGHT);
+  }
+
+  function renderBars() {
+    var step = steps[currentStep];
+    var arr = step.array;
+
+    barsContainer.innerHTML = '';
+
+    for (var i = 0; i < arr.length; i++) {
+      var value = arr[i];
+      var h = barHeight(value);
+
+      // Determine bar state
+      var isKey = (step.highlightKey === i && (step.type === 'take_key' || step.type === 'insert'));
+      var isShift = (step.type === 'shift' && (i === step.highlightShift || i === step.highlightShift + 1));
+      var isSorted = step.sorted.indexOf(i) !== -1 && !isKey && !isShift;
+
+      // Bar wrapper
+      var wrapper = document.createElement('div');
+      wrapper.className = 'flex flex-col items-center gap-1.5';
+
+      // Bar element
+      var bar = document.createElement('div');
+      bar.style.height = h + 'px';
+      bar.style.width = '2.25rem';
+      bar.style.transition = prefersReducedMotion ? 'none' : 'all 0.3s ease';
+      bar.style.borderRadius = '0.375rem';
+
+      var barClasses = 'w-9 rounded-md ';
+
+      if (isKey) {
+        barClasses += 'border-2 border-indigo-500 bg-indigo-500/10';
+        bar.style.transform = 'translateY(-8px)';
+      } else if (isShift) {
+        barClasses += 'border-2 border-amber-400 bg-amber-500/10';
+        bar.style.transform = 'translateY(0)';
+      } else if (isSorted) {
+        barClasses += 'border-2 border-cyan-400 bg-cyan-500/10';
+        bar.style.transform = 'translateY(0)';
+      } else {
+        barClasses += 'border border-[#1e2330] bg-[#13161e]';
+        bar.style.transform = 'translateY(0)';
+      }
+
+      bar.className = barClasses;
+
+      // Value label
+      var label = document.createElement('span');
+      label.className = 'text-xs font-mono text-atlas-muted';
+      label.textContent = value;
+
+      wrapper.appendChild(bar);
+      wrapper.appendChild(label);
+      barsContainer.appendChild(wrapper);
+    }
+  }
+
+  function updateUI() {
+    var step = steps[currentStep];
+    explanationEl.textContent = step.explanation;
+    counterEl.textContent = 'Step ' + currentStep + ' / ' + (steps.length - 1);
+    renderBars();
+
+    // Button states
+    if (currentStep >= steps.length - 1) {
+      stopPlaying();
+      playBtn.disabled = true;
+      playBtn.classList.add('opacity-40', 'cursor-not-allowed');
+      stepBtn.disabled = true;
+      stepBtn.classList.add('opacity-40', 'cursor-not-allowed');
+    } else {
+      playBtn.disabled = false;
+      playBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+      if (playing) {
+        stepBtn.disabled = true;
+        stepBtn.classList.add('opacity-40', 'cursor-not-allowed');
+      } else {
+        stepBtn.disabled = false;
+        stepBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+      }
+    }
+
+    playBtn.textContent = playing ? 'Pause' : 'Play';
+  }
+
+  // --- Playback ---
+  function getSpeed() {
+    return parseInt(speedSelect.value, 10);
+  }
+
+  function advanceStep() {
+    if (currentStep < steps.length - 1) {
+      currentStep++;
+      updateUI();
+    } else {
+      stopPlaying();
+      updateUI();
+    }
+  }
+
+  function startPlaying() {
+    if (currentStep >= steps.length - 1) return;
+    playing = true;
+    updateUI();
+    scheduleNext();
+  }
+
+  function stopPlaying() {
+    playing = false;
+    if (timerId !== null) {
+      clearTimeout(timerId);
+      timerId = null;
+    }
+  }
+
+  function scheduleNext() {
+    if (!playing) return;
+    timerId = setTimeout(function () {
+      advanceStep();
+      if (playing && currentStep < steps.length - 1) {
+        scheduleNext();
+      } else {
+        stopPlaying();
+        updateUI();
+      }
+    }, getSpeed());
+  }
+
+  function resetState() {
+    stopPlaying();
+    currentStep = 0;
+    updateUI();
+  }
+
+  // --- Event listeners ---
+  playBtn.addEventListener('click', function () {
+    if (playing) {
+      stopPlaying();
+      updateUI();
+    } else {
+      startPlaying();
+    }
+  });
+
+  stepBtn.addEventListener('click', function () {
+    if (!playing) {
+      advanceStep();
+    }
+  });
+
+  resetBtn.addEventListener('click', function () {
+    resetState();
+  });
+
+  speedSelect.addEventListener('change', function () {
+    if (playing) {
+      if (timerId !== null) {
+        clearTimeout(timerId);
+        timerId = null;
+      }
+      scheduleNext();
+    }
+  });
+
+  // --- Reduced motion: disable auto-play, hide play button ---
+  if (prefersReducedMotion) {
+    playBtn.style.display = 'none';
+    speedSelect.style.display = 'none';
+  }
+
+  // --- Initial render ---
+  updateUI();
+})();
+</script>

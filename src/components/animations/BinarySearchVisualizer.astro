@@ -1,0 +1,429 @@
+---
+// Interactive binary search visualization with step-by-step walkthrough
+---
+<div
+  id="binary-search-container"
+  class="bg-[#0a0c12] border border-[#1e2330] rounded-xl p-6 my-8 not-prose select-none"
+>
+  <!-- Title row -->
+  <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+    <p class="text-sm font-mono font-semibold text-atlas-accent">Binary Search</p>
+    <div class="flex items-center gap-2">
+      <label for="binary-search-target" class="text-xs text-atlas-muted font-mono">
+        Target:
+      </label>
+      <select
+        id="binary-search-target"
+        class="bg-atlas-surface border border-atlas-border rounded-md px-2 py-1 text-xs font-mono text-atlas-text focus:outline-none focus:border-atlas-accent transition-colors"
+      >
+        <option value="2">2</option>
+        <option value="5">5</option>
+        <option value="8">8</option>
+        <option value="12">12</option>
+        <option value="16">16</option>
+        <option value="23" selected>23</option>
+        <option value="38">38</option>
+        <option value="56">56</option>
+        <option value="72">72</option>
+        <option value="91">91</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Array boxes -->
+  <div class="overflow-x-auto pb-2">
+    <div id="binary-search-array" class="flex gap-2 justify-center min-w-max mx-auto"></div>
+  </div>
+
+  <!-- Pointer labels (L / M / R) -->
+  <div class="overflow-x-auto">
+    <div id="binary-search-pointers" class="flex gap-2 justify-center min-w-max mx-auto mt-1 h-5"></div>
+  </div>
+
+  <!-- Explanation panel -->
+  <div
+    id="binary-search-explanation"
+    class="mt-4 bg-atlas-surface border border-atlas-border rounded-lg px-4 py-3 text-sm font-mono text-atlas-muted-2 min-h-[2.5rem] flex items-center"
+  >
+    Press Play or Step to begin.
+  </div>
+
+  <!-- Controls bar -->
+  <div class="mt-4 flex items-center gap-3 flex-wrap">
+    <button
+      id="binary-search-play"
+      class="px-3 py-1.5 text-xs font-mono rounded-md bg-atlas-accent/10 text-atlas-accent hover:bg-atlas-accent/20 transition-colors flex items-center gap-1.5"
+      aria-label="Play or pause auto-stepping"
+    >
+      <span id="binary-search-play-icon">&#9654;</span>
+      <span id="binary-search-play-label">Play</span>
+    </button>
+    <button
+      id="binary-search-step"
+      class="px-3 py-1.5 text-xs font-mono rounded-md bg-atlas-border text-atlas-muted hover:text-atlas-text transition-colors"
+      aria-label="Advance one step"
+    >
+      Step
+    </button>
+    <button
+      id="binary-search-reset"
+      class="px-3 py-1.5 text-xs font-mono rounded-md bg-atlas-border text-atlas-muted hover:text-atlas-text transition-colors"
+      aria-label="Reset visualization"
+    >
+      Reset
+    </button>
+
+    <div class="flex items-center gap-2 ml-auto">
+      <label for="binary-search-speed" class="text-xs text-atlas-muted font-mono">Speed:</label>
+      <select
+        id="binary-search-speed"
+        class="bg-atlas-surface border border-atlas-border rounded-md px-2 py-1 text-xs font-mono text-atlas-text focus:outline-none focus:border-atlas-accent transition-colors"
+      >
+        <option value="1200">Slow</option>
+        <option value="600" selected>Normal</option>
+        <option value="250">Fast</option>
+      </select>
+    </div>
+
+    <span
+      id="binary-search-counter"
+      class="text-xs font-mono text-atlas-muted ml-2"
+    >
+      Step 0 / 0
+    </span>
+  </div>
+</div>
+
+<script is:inline>
+(function () {
+  // ── Constants ───────────────────────────────────────────────
+  var SORTED_ARRAY = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91];
+
+  // ── DOM references ──────────────────────────────────────────
+  var container     = document.getElementById('binary-search-container');
+  var arrayEl       = document.getElementById('binary-search-array');
+  var pointersEl    = document.getElementById('binary-search-pointers');
+  var explanationEl = document.getElementById('binary-search-explanation');
+  var playBtn       = document.getElementById('binary-search-play');
+  var playIcon      = document.getElementById('binary-search-play-icon');
+  var playLabel     = document.getElementById('binary-search-play-label');
+  var stepBtn       = document.getElementById('binary-search-step');
+  var resetBtn      = document.getElementById('binary-search-reset');
+  var speedSelect   = document.getElementById('binary-search-speed');
+  var targetSelect  = document.getElementById('binary-search-target');
+  var counterEl     = document.getElementById('binary-search-counter');
+
+  if (!container || !arrayEl) return;
+
+  // ── State ───────────────────────────────────────────────────
+  var steps = [];
+  var currentStep = -1; // -1 = initial (no step executed yet)
+  var playing = false;
+  var timerId = null;
+
+  // ── prefers-reduced-motion ──────────────────────────────────
+  var prefersReducedMotion =
+    window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (prefersReducedMotion) {
+    playBtn.style.display = 'none';
+    speedSelect.parentElement.style.display = 'none';
+  }
+
+  // ── Pre-compute binary search steps ─────────────────────────
+  function computeSteps(target) {
+    var result = [];
+    var left = 0;
+    var right = SORTED_ARRAY.length - 1;
+    var eliminated = [];
+
+    // Step 0: initial state — show the full range, no mid highlight
+    result.push({
+      left: left,
+      right: right,
+      mid: -1,
+      midValue: null,
+      found: false,
+      eliminated: [],
+      explanation: 'Starting binary search for ' + target + ' in array [' + SORTED_ARRAY.join(', ') + '].'
+    });
+
+    while (left <= right) {
+      var mid = Math.floor((left + right) / 2);
+      var midVal = SORTED_ARRAY[mid];
+      var newEliminated;
+      var explanation;
+      var found = false;
+
+      if (midVal === target) {
+        found = true;
+        explanation =
+          'Searching range [' + left + '..' + right + ']. Mid = index ' + mid +
+          ' (value: ' + midVal + '). Found! Returning index ' + mid + '.';
+        newEliminated = eliminated.slice();
+      } else if (target < midVal) {
+        explanation =
+          'Searching range [' + left + '..' + right + ']. Mid = index ' + mid +
+          ' (value: ' + midVal + '). Target ' + target + ' < ' + midVal + ' \u2192 search left half.';
+        newEliminated = eliminated.slice();
+        for (var e = mid; e <= right; e++) {
+          if (newEliminated.indexOf(e) === -1) newEliminated.push(e);
+        }
+        right = mid - 1;
+      } else {
+        explanation =
+          'Searching range [' + left + '..' + right + ']. Mid = index ' + mid +
+          ' (value: ' + midVal + '). Target ' + target + ' > ' + midVal + ' \u2192 search right half.';
+        newEliminated = eliminated.slice();
+        for (var e2 = left; e2 <= mid; e2++) {
+          if (newEliminated.indexOf(e2) === -1) newEliminated.push(e2);
+        }
+        left = mid + 1;
+      }
+
+      eliminated = newEliminated;
+
+      result.push({
+        left: left,
+        right: right,
+        mid: mid,
+        midValue: midVal,
+        found: found,
+        eliminated: eliminated.slice(),
+        explanation: explanation
+      });
+
+      if (found) break;
+    }
+
+    return result;
+  }
+
+  // ── Render array boxes ──────────────────────────────────────
+  function buildBoxes() {
+    arrayEl.innerHTML = '';
+    pointersEl.innerHTML = '';
+    for (var i = 0; i < SORTED_ARRAY.length; i++) {
+      // Box wrapper (value + index)
+      var cell = document.createElement('div');
+      cell.className = 'flex flex-col items-center gap-1';
+      cell.id = 'binary-search-cell-' + i;
+
+      var box = document.createElement('div');
+      box.className =
+        'binary-search-box w-14 h-12 flex items-center justify-center rounded-lg text-sm font-mono transition-all duration-300 border border-[#1e2330] bg-[#13161e] text-atlas-text';
+      box.id = 'binary-search-box-' + i;
+      box.textContent = SORTED_ARRAY[i];
+
+      var idx = document.createElement('span');
+      idx.className = 'text-[10px] text-atlas-muted font-mono';
+      idx.textContent = '[' + i + ']';
+
+      cell.appendChild(box);
+      cell.appendChild(idx);
+      arrayEl.appendChild(cell);
+
+      // Pointer placeholder
+      var ptr = document.createElement('div');
+      ptr.className = 'w-14 text-center text-[10px] font-mono font-bold transition-opacity duration-300';
+      ptr.id = 'binary-search-ptr-' + i;
+      ptr.innerHTML = '&nbsp;';
+      pointersEl.appendChild(ptr);
+    }
+  }
+
+  // ── Render a given step ─────────────────────────────────────
+  function renderStep(stepIndex) {
+    var step = steps[stepIndex];
+    if (!step) return;
+
+    for (var i = 0; i < SORTED_ARRAY.length; i++) {
+      var box = document.getElementById('binary-search-box-' + i);
+      var ptr = document.getElementById('binary-search-ptr-' + i);
+      if (!box || !ptr) continue;
+
+      // Reset classes
+      box.className =
+        'binary-search-box w-14 h-12 flex items-center justify-center rounded-lg text-sm font-mono transition-all duration-300';
+
+      ptr.innerHTML = '&nbsp;';
+      ptr.className = 'w-14 text-center text-[10px] font-mono font-bold transition-opacity duration-300';
+
+      var isEliminated = step.eliminated.indexOf(i) !== -1;
+
+      if (step.found && i === step.mid) {
+        // Found target — cyan highlight
+        box.className += ' border-2 border-cyan-400 bg-cyan-500/10 text-atlas-text';
+        box.innerHTML = SORTED_ARRAY[i] + ' <span class="ml-1 text-cyan-400">&#10003;</span>';
+        ptr.textContent = 'FOUND';
+        ptr.className += ' text-cyan-400';
+      } else if (!step.found && i === step.mid) {
+        // Current midpoint — indigo highlight
+        box.className += ' border-2 border-indigo-500 bg-indigo-500/10 text-atlas-text';
+        box.textContent = SORTED_ARRAY[i];
+        ptr.textContent = 'M';
+        ptr.className += ' text-indigo-400';
+      } else if (isEliminated) {
+        // Eliminated
+        box.className += ' border border-[#1e2330] bg-[#13161e] text-atlas-text opacity-30';
+        box.textContent = SORTED_ARRAY[i];
+      } else {
+        // In range — normal
+        box.className += ' border border-[#1e2330] bg-[#13161e] text-atlas-text';
+        box.textContent = SORTED_ARRAY[i];
+      }
+
+      // Left / Right pointers (only when step has a valid range and we haven't found yet)
+      if (!step.found && step.mid !== -1) {
+        // Compute the effective left/right for display
+        // For "go right" or "go left" the new left/right are already updated,
+        // but the mid shown is from the *previous* range. We show L/R of the
+        // range that was searched in this step, which is encoded in the explanation.
+        // However, after elimination the left/right have been updated.
+        // For display clarity we show L at the left boundary of the active range
+        // that will be searched NEXT (i.e. the updated left/right).
+        // But for the current step the mid is from the range before the update,
+        // so we derive the "searched" range from the step data.
+      }
+    }
+
+    // Show L / R pointers for active range (non-eliminated, non-mid)
+    if (!step.found && step.mid >= 0) {
+      // The searched range for this step is the range BEFORE elimination.
+      // We can derive it: the range is the contiguous non-eliminated region containing mid.
+      // Simpler: for display, show L at min active index, R at max active index after this step.
+      var activeLeft = -1;
+      var activeRight = -1;
+      for (var a = 0; a < SORTED_ARRAY.length; a++) {
+        if (step.eliminated.indexOf(a) === -1 && a !== step.mid) {
+          if (activeLeft === -1) activeLeft = a;
+          activeRight = a;
+        }
+      }
+      if (activeLeft >= 0) {
+        var ptrL = document.getElementById('binary-search-ptr-' + activeLeft);
+        if (ptrL) {
+          ptrL.textContent = 'L';
+          ptrL.className += ' text-emerald-400';
+        }
+      }
+      if (activeRight >= 0 && activeRight !== activeLeft) {
+        var ptrR = document.getElementById('binary-search-ptr-' + activeRight);
+        if (ptrR) {
+          ptrR.textContent = 'R';
+          ptrR.className += ' text-amber-400';
+        }
+      }
+    }
+
+    // Initial step (step 0) — show L and R at full range bounds
+    if (step.mid === -1 && stepIndex === 0) {
+      var ptrL0 = document.getElementById('binary-search-ptr-' + step.left);
+      var ptrR0 = document.getElementById('binary-search-ptr-' + step.right);
+      if (ptrL0) {
+        ptrL0.textContent = 'L';
+        ptrL0.className += ' text-emerald-400';
+      }
+      if (ptrR0) {
+        ptrR0.textContent = 'R';
+        ptrR0.className += ' text-amber-400';
+      }
+    }
+
+    // Update explanation
+    explanationEl.textContent = step.explanation;
+
+    // Update counter
+    counterEl.textContent = 'Step ' + (stepIndex + 1) + ' / ' + steps.length;
+  }
+
+  // ── Advance one step ────────────────────────────────────────
+  function advance() {
+    if (currentStep >= steps.length - 1) {
+      stopPlaying();
+      return;
+    }
+    currentStep++;
+    renderStep(currentStep);
+
+    // If this step is the found step, stop auto-play
+    if (steps[currentStep] && steps[currentStep].found) {
+      stopPlaying();
+    }
+  }
+
+  // ── Auto-play ───────────────────────────────────────────────
+  function startPlaying() {
+    if (prefersReducedMotion) return;
+    playing = true;
+    playIcon.innerHTML = '&#9646;&#9646;';
+    playLabel.textContent = 'Pause';
+    stepBtn.disabled = true;
+    stepBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+    var speed = parseInt(speedSelect.value, 10) || 600;
+    // Advance immediately on first press if at initial state
+    if (currentStep < 0) advance();
+
+    timerId = setInterval(function () {
+      advance();
+      if (!playing) clearInterval(timerId);
+    }, speed);
+  }
+
+  function stopPlaying() {
+    playing = false;
+    if (timerId) clearInterval(timerId);
+    timerId = null;
+    playIcon.innerHTML = '&#9654;';
+    playLabel.textContent = 'Play';
+    stepBtn.disabled = false;
+    stepBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+  }
+
+  // ── Reset ───────────────────────────────────────────────────
+  function resetAll() {
+    stopPlaying();
+    var target = parseInt(targetSelect.value, 10);
+    steps = computeSteps(target);
+    currentStep = -1;
+    buildBoxes();
+    explanationEl.textContent = 'Press Play or Step to begin.';
+    counterEl.textContent = 'Step 0 / ' + steps.length;
+  }
+
+  // ── Event listeners ─────────────────────────────────────────
+  playBtn.addEventListener('click', function () {
+    if (playing) {
+      stopPlaying();
+    } else {
+      // If finished, reset first
+      if (currentStep >= steps.length - 1) resetAll();
+      startPlaying();
+    }
+  });
+
+  stepBtn.addEventListener('click', function () {
+    if (playing) return;
+    advance();
+  });
+
+  resetBtn.addEventListener('click', function () {
+    resetAll();
+  });
+
+  speedSelect.addEventListener('change', function () {
+    if (playing) {
+      stopPlaying();
+      startPlaying();
+    }
+  });
+
+  targetSelect.addEventListener('change', function () {
+    resetAll();
+  });
+
+  // ── Initialize ──────────────────────────────────────────────
+  resetAll();
+})();
+</script>

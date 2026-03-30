@@ -1,0 +1,330 @@
+---
+// Interactive selection sort visualization with step-by-step animation
+---
+<div class="bg-[#0a0c12] border border-[#1e2330] rounded-xl p-6 my-8 not-prose select-none" id="selection-sort-container">
+  <!-- Bar chart visual area -->
+  <div id="selection-sort-bars" class="h-56 flex items-end justify-center gap-3"></div>
+
+  <!-- Step explanation panel -->
+  <div class="mt-4 mb-4 min-h-[2rem] flex items-center justify-center">
+    <p id="selection-sort-explanation" class="text-sm font-mono text-atlas-muted-2 text-center leading-relaxed"></p>
+  </div>
+
+  <!-- Controls bar -->
+  <div class="flex flex-wrap items-center justify-center gap-3">
+    <button
+      id="selection-sort-play"
+      class="px-4 py-1.5 text-xs font-mono bg-atlas-accent/10 text-atlas-accent rounded-md hover:bg-atlas-accent/20 transition-colors"
+    >
+      Play
+    </button>
+    <button
+      id="selection-sort-step"
+      class="px-4 py-1.5 text-xs font-mono bg-atlas-border text-atlas-muted rounded-md hover:text-atlas-text transition-colors"
+    >
+      Step
+    </button>
+    <button
+      id="selection-sort-reset"
+      class="px-4 py-1.5 text-xs font-mono bg-atlas-border text-atlas-muted rounded-md hover:text-atlas-text transition-colors"
+    >
+      Reset
+    </button>
+    <select
+      id="selection-sort-speed"
+      class="px-3 py-1.5 text-xs font-mono bg-atlas-surface border border-atlas-border rounded-md text-atlas-muted focus:outline-none focus:border-atlas-accent"
+    >
+      <option value="1200">Slow</option>
+      <option value="600" selected>Normal</option>
+      <option value="250">Fast</option>
+    </select>
+    <span id="selection-sort-counter" class="text-xs font-mono text-atlas-muted ml-1">
+      Step 0 / 0
+    </span>
+  </div>
+</div>
+
+<script is:inline>
+(function () {
+  var INITIAL = [29, 10, 14, 37, 13, 43, 6];
+  var MIN_HEIGHT = 20;
+  var MAX_HEIGHT = 140;
+  var minVal = Math.min.apply(null, INITIAL);
+  var maxVal = Math.max.apply(null, INITIAL);
+
+  // --- Precompute all steps ---
+  function computeSteps(arr) {
+    var steps = [];
+    var a = arr.slice();
+    var n = a.length;
+    var sorted = [];
+
+    // Initial state
+    steps.push({
+      array: a.slice(),
+      comparing: [],
+      minimum: -1,
+      sorted: [],
+      explanation: "Initial array. Press Play or Step to begin selection sort."
+    });
+
+    for (var i = 0; i < n - 1; i++) {
+      var minIdx = i;
+
+      // Show start of scan
+      steps.push({
+        array: a.slice(),
+        comparing: [i],
+        minimum: i,
+        sorted: sorted.slice(),
+        explanation: "Starting scan from index " + i + ". Assuming " + a[i] + " (index " + i + ") is the minimum."
+      });
+
+      for (var j = i + 1; j < n; j++) {
+        // Comparing j with current minimum
+        var isNewMin = a[j] < a[minIdx];
+        steps.push({
+          array: a.slice(),
+          comparing: [j],
+          minimum: minIdx,
+          sorted: sorted.slice(),
+          explanation: "Comparing " + a[j] + " (index " + j + ") with current minimum " + a[minIdx] + " (index " + minIdx + ")." +
+            (isNewMin ? " New minimum found!" : " No change.")
+        });
+
+        if (isNewMin) {
+          minIdx = j;
+          steps.push({
+            array: a.slice(),
+            comparing: [],
+            minimum: minIdx,
+            sorted: sorted.slice(),
+            explanation: "Scanning for minimum in positions " + i + "\u2013" + (n - 1) + ". Current minimum: " + a[minIdx] + " at index " + minIdx + "."
+          });
+        }
+      }
+
+      // Swap phase
+      if (minIdx !== i) {
+        steps.push({
+          array: a.slice(),
+          comparing: [i, minIdx],
+          minimum: -1,
+          sorted: sorted.slice(),
+          explanation: "Swapping " + a[i] + " (index " + i + ") with " + a[minIdx] + " (index " + minIdx + ")."
+        });
+        var tmp = a[i];
+        a[i] = a[minIdx];
+        a[minIdx] = tmp;
+      } else {
+        steps.push({
+          array: a.slice(),
+          comparing: [],
+          minimum: i,
+          sorted: sorted.slice(),
+          explanation: a[i] + " is already in the correct position at index " + i + "."
+        });
+      }
+
+      sorted.push(i);
+
+      // Placed phase
+      steps.push({
+        array: a.slice(),
+        comparing: [],
+        minimum: -1,
+        sorted: sorted.slice(),
+        explanation: a[i] + " is now in its final position."
+      });
+    }
+
+    // Last element is automatically sorted
+    sorted.push(n - 1);
+    steps.push({
+      array: a.slice(),
+      comparing: [],
+      minimum: -1,
+      sorted: sorted.slice(),
+      explanation: "Selection sort complete! The array is fully sorted."
+    });
+
+    return steps;
+  }
+
+  var steps = computeSteps(INITIAL);
+
+  // --- DOM references ---
+  var container = document.getElementById("selection-sort-container");
+  if (!container) return;
+  var barsEl = document.getElementById("selection-sort-bars");
+  var explanationEl = document.getElementById("selection-sort-explanation");
+  var playBtn = document.getElementById("selection-sort-play");
+  var stepBtn = document.getElementById("selection-sort-step");
+  var resetBtn = document.getElementById("selection-sort-reset");
+  var speedSel = document.getElementById("selection-sort-speed");
+  var counterEl = document.getElementById("selection-sort-counter");
+
+  // --- State ---
+  var currentStep = 0;
+  var playing = false;
+  var timerId = null;
+  var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // --- Height helper ---
+  function barHeight(val) {
+    if (maxVal === minVal) return (MIN_HEIGHT + MAX_HEIGHT) / 2;
+    return MIN_HEIGHT + ((val - minVal) / (maxVal - minVal)) * (MAX_HEIGHT - MIN_HEIGHT);
+  }
+
+  // --- Render ---
+  function render(step) {
+    var s = steps[step];
+    if (!s || !barsEl) return;
+
+    barsEl.innerHTML = "";
+
+    for (var k = 0; k < s.array.length; k++) {
+      var val = s.array[k];
+      var h = barHeight(val);
+
+      var isSorted = s.sorted.indexOf(k) !== -1;
+      var isComparing = s.comparing.indexOf(k) !== -1;
+      var isMinimum = s.minimum === k;
+
+      var barClasses = "flex flex-col items-center justify-end rounded-md transition-all duration-200 w-12";
+
+      if (isSorted) {
+        barClasses += " border-2 border-cyan-400 bg-cyan-500/10";
+      } else if (isMinimum) {
+        barClasses += " border-2 border-amber-400 bg-amber-500/10";
+      } else if (isComparing) {
+        barClasses += " border-2 border-indigo-500 bg-indigo-500/10";
+      } else {
+        barClasses += " border border-[#1e2330] bg-[#13161e]";
+      }
+
+      var barDiv = document.createElement("div");
+      barDiv.className = barClasses;
+      barDiv.style.height = h + "px";
+
+      var label = document.createElement("span");
+      if (isSorted) {
+        label.className = "text-xs font-mono mt-2 text-cyan-400";
+      } else if (isMinimum) {
+        label.className = "text-xs font-mono mt-2 text-amber-400";
+      } else if (isComparing) {
+        label.className = "text-xs font-mono mt-2 text-indigo-400";
+      } else {
+        label.className = "text-xs font-mono mt-2 text-atlas-muted";
+      }
+      label.textContent = val;
+
+      var wrapper = document.createElement("div");
+      wrapper.className = "flex flex-col items-center";
+      wrapper.appendChild(barDiv);
+      wrapper.appendChild(label);
+
+      barsEl.appendChild(wrapper);
+    }
+
+    if (explanationEl) {
+      explanationEl.textContent = s.explanation;
+    }
+
+    if (counterEl) {
+      counterEl.textContent = "Step " + step + " / " + (steps.length - 1);
+    }
+  }
+
+  // --- Auto-play ---
+  function getSpeed() {
+    return parseInt(speedSel ? speedSel.value : "600", 10);
+  }
+
+  function stopAutoPlay() {
+    playing = false;
+    if (timerId !== null) {
+      clearTimeout(timerId);
+      timerId = null;
+    }
+    if (playBtn) playBtn.textContent = "Play";
+    if (stepBtn) stepBtn.removeAttribute("disabled");
+    if (stepBtn) stepBtn.classList.remove("opacity-40", "cursor-not-allowed");
+  }
+
+  function startAutoPlay() {
+    if (prefersReduced) return;
+    playing = true;
+    if (playBtn) playBtn.textContent = "Pause";
+    if (stepBtn) stepBtn.setAttribute("disabled", "true");
+    if (stepBtn) stepBtn.classList.add("opacity-40", "cursor-not-allowed");
+    tick();
+  }
+
+  function tick() {
+    if (!playing) return;
+    if (currentStep >= steps.length - 1) {
+      stopAutoPlay();
+      return;
+    }
+    currentStep++;
+    render(currentStep);
+    timerId = setTimeout(tick, getSpeed());
+  }
+
+  // --- Event listeners ---
+  if (playBtn) {
+    playBtn.addEventListener("click", function () {
+      if (playing) {
+        stopAutoPlay();
+      } else {
+        if (currentStep >= steps.length - 1) {
+          currentStep = 0;
+          render(currentStep);
+        }
+        startAutoPlay();
+      }
+    });
+  }
+
+  if (stepBtn) {
+    stepBtn.addEventListener("click", function () {
+      if (playing) return;
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        render(currentStep);
+      }
+    });
+  }
+
+  if (resetBtn) {
+    resetBtn.addEventListener("click", function () {
+      stopAutoPlay();
+      currentStep = 0;
+      render(currentStep);
+    });
+  }
+
+  if (speedSel) {
+    speedSel.addEventListener("change", function () {
+      if (playing) {
+        if (timerId !== null) clearTimeout(timerId);
+        timerId = setTimeout(tick, getSpeed());
+      }
+    });
+  }
+
+  // --- prefers-reduced-motion ---
+  if (prefersReduced) {
+    if (playBtn) {
+      playBtn.style.display = "none";
+    }
+    if (speedSel) {
+      speedSel.style.display = "none";
+    }
+  }
+
+  // --- Initial render ---
+  render(0);
+})();
+</script>

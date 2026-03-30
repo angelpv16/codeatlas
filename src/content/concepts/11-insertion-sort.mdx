@@ -1,0 +1,95 @@
+---
+title: "Insertion Sort"
+titleEs: "Insertion Sort"
+description: "Build the sorted array one element at a time by inserting each new element into its correct position."
+descriptionEs: "Construye el array ordenado un elemento a la vez insertando cada nuevo elemento en su posición correcta."
+order: 11
+section: "algorithms"
+level: "beginner"
+estimatedMinutes: 8
+tags: ["algorithms", "sorting", "insertion-sort"]
+hasAnimation: true
+publishedAt: 2024-01-11
+relatedConcepts: ["10-selection-sort", "09-bubble-sort"]
+---
+import InsertionSortVisualizer from '../../components/animations/InsertionSortVisualizer.astro';
+
+## What It Does
+
+**Insertion sort** builds the sorted array one element at a time. It takes each element from the unsorted portion and inserts it into the correct position in the sorted portion by shifting larger elements to the right.
+
+## Real-World Analogy
+
+Think of sorting cards as you pick them up one by one. Each new card gets inserted into the right spot among the cards you're already holding. You slide existing cards over to make room.
+
+## See It in Action
+
+<InsertionSortVisualizer />
+
+## Python Implementation
+
+```python
+def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key
+    return arr
+
+numbers = [9, 5, 1, 8, 3, 7, 4]
+print(insertion_sort(numbers))
+# [1, 3, 4, 5, 7, 8, 9]
+```
+
+The `key` is the current element being inserted. We compare it against elements in the sorted portion (right to left), shifting each larger element one position right until we find the correct spot.
+
+## The "Key" Concept
+
+The **key** is the element currently being inserted. It's temporarily "removed" from the array while we shift larger elements right to make room for it. Once the correct position is found, the key is placed there.
+
+```
+[3, 7, 9, | 5, 1, 8]    key = 5
+[3, 7, 9, | _, 1, 8]    remove 5, compare with 9
+[3, 7, _, | 9, 1, 8]    9 > 5, shift right
+[3, _, 7, | 9, 1, 8]    7 > 5, shift right
+[3, 5, 7, | 9, 1, 8]    3 < 5, insert here
+```
+
+## Time & Space Complexity
+
+| Case | Time | Why |
+|------|------|-----|
+| Best (already sorted) | O(n) | Inner while loop never runs |
+| Average | O(n²) | Each element shifts partway |
+| Worst (reverse sorted) | O(n²) | Every element shifts to the start |
+
+**Space complexity:** O(1) — sorts in place.
+
+## When to Use It
+
+Insertion sort shines in specific scenarios:
+
+- **Small arrays** (< 20 elements) — the overhead of fancier algorithms isn't worth it
+- **Nearly sorted data** — the inner loop barely runs, approaching O(n)
+- **Online sorting** — you can sort elements as they arrive, one at a time
+
+Many real sorting libraries (like Python's Timsort) use insertion sort internally for small subarrays because it's faster than merge sort at small sizes due to lower constant factors.
+
+## Common Mistake
+
+Starting the outer loop at index 0 instead of 1. The first element is already "sorted" by itself — there's nothing to compare it to:
+
+```python
+# Wrong — wastes a comparison on a single element
+for i in range(0, len(arr)):
+
+# Correct — first element is trivially sorted
+for i in range(1, len(arr)):
+```
+
+## What's Next?
+
+Now that you know three sorting algorithms, let's switch to **searching**. **Linear Search** is the simplest way to find an element in an array — checking each item one by one.

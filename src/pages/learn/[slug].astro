@@ -95,6 +95,48 @@ const quizzes: Record<string, { question: string; questionEs: string; options: s
     optionsEs: ['O(n²)', 'O(n)', 'O(log n)', 'O(1)'],
     correctIndex: 3,
   },
+  '09-bubble-sort': {
+    question: 'What is the worst-case time complexity of bubble sort?',
+    questionEs: '¿Cuál es la complejidad temporal en el peor caso de bubble sort?',
+    options: ['O(n)', 'O(n log n)', 'O(n²)', 'O(1)'],
+    optionsEs: ['O(n)', 'O(n log n)', 'O(n²)', 'O(1)'],
+    correctIndex: 2,
+  },
+  '10-selection-sort': {
+    question: 'What is the time complexity of selection sort in all cases?',
+    questionEs: '¿Cuál es la complejidad temporal de selection sort en todos los casos?',
+    options: ['O(n)', 'O(n log n)', 'O(n²)', 'O(log n)'],
+    optionsEs: ['O(n)', 'O(n log n)', 'O(n²)', 'O(log n)'],
+    correctIndex: 2,
+  },
+  '11-insertion-sort': {
+    question: 'What is the best-case time complexity of insertion sort?',
+    questionEs: '¿Cuál es la complejidad temporal en el mejor caso de insertion sort?',
+    options: ['O(n²)', 'O(n log n)', 'O(n)', 'O(1)'],
+    optionsEs: ['O(n²)', 'O(n log n)', 'O(n)', 'O(1)'],
+    correctIndex: 2,
+  },
+  '12-linear-search': {
+    question: 'What is the worst-case time complexity of linear search?',
+    questionEs: '¿Cuál es la complejidad temporal en el peor caso de búsqueda lineal?',
+    options: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'],
+    optionsEs: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'],
+    correctIndex: 2,
+  },
+  '13-binary-search': {
+    question: 'What is the time complexity of binary search?',
+    questionEs: '¿Cuál es la complejidad temporal de la búsqueda binaria?',
+    options: ['O(n)', 'O(n²)', 'O(log n)', 'O(1)'],
+    optionsEs: ['O(n)', 'O(n²)', 'O(log n)', 'O(1)'],
+    correctIndex: 2,
+  },
+  '14-recursion': {
+    question: 'What happens if a recursive function has no base case?',
+    questionEs: '¿Qué pasa si una función recursiva no tiene caso base?',
+    options: ['It returns 0', 'It runs once', 'It causes infinite recursion', 'It skips the function'],
+    optionsEs: ['Devuelve 0', 'Se ejecuta una vez', 'Causa recursión infinita', 'Salta la función'],
+    correctIndex: 2,
+  },
 };
 
 const quiz = quizzes[entry.slug];

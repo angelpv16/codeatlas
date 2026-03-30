@@ -8,7 +8,7 @@ interface Props {
   description: string;
   descriptionEs: string;
   level: 'beginner' | 'intermediate' | 'advanced';
-  section?: 'fundamentals' | 'dsa';
+  section?: 'fundamentals' | 'dsa' | 'algorithms';
   estimatedMinutes: number;
   slug: string;
   lang?: Lang;
@@ -37,7 +37,7 @@ const badgeClass = {
   advanced: 'atlas-badge-advanced',
 }[level];
 
-const sectionLabel = section === 'dsa' ? 'DSA' : (lang === 'es' ? 'Fundamentos' : 'Fundamentals');
+const sectionLabel = section === 'dsa' ? 'DSA' : section === 'algorithms' ? (lang === 'es' ? 'Algoritmos' : 'Algorithms') : (lang === 'es' ? 'Fundamentos' : 'Fundamentals');
 ---
 <a href={`${base}learn/${slug}/`}
    class="group block bg-atlas-surface border border-atlas-border rounded-xl p-5 transition-all duration-200 hover:border-atlas-border-2 hover:bg-atlas-surface-2">

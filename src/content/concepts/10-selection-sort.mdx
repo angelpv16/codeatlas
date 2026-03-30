@@ -1,0 +1,85 @@
+---
+title: "Selection Sort"
+titleEs: "Selection Sort"
+description: "Find the minimum element, place it at the front. Repeat for the remaining unsorted portion."
+descriptionEs: "Encuentra el elemento mínimo, colócalo al frente. Repite para la porción no ordenada restante."
+order: 10
+section: "algorithms"
+level: "beginner"
+estimatedMinutes: 8
+tags: ["algorithms", "sorting", "selection-sort"]
+hasAnimation: true
+publishedAt: 2024-01-10
+relatedConcepts: ["09-bubble-sort", "11-insertion-sort"]
+---
+import SelectionSortVisualizer from '../../components/animations/SelectionSortVisualizer.astro';
+
+## What It Does
+
+**Selection sort** divides the array into two halves: sorted (left) and unsorted (right). On each pass, it scans the entire unsorted half to find the minimum element, then places it at the beginning of the unsorted half — growing the sorted portion by one.
+
+## Real-World Analogy
+
+Think of sorting playing cards. You scan your whole hand for the lowest card and move it to the leftmost position. Then you scan the remaining cards for the next lowest and move it to position 2. Repeat until all cards are in order.
+
+## See It in Action
+
+<SelectionSortVisualizer />
+
+## Python Implementation
+
+```python
+def selection_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        min_idx = i
+        for j in range(i + 1, n):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+    return arr
+
+numbers = [29, 10, 14, 37, 13, 43, 6]
+print(selection_sort(numbers))
+# [6, 10, 13, 14, 29, 37, 43]
+```
+
+For each position `i`, we find the index of the smallest element in the remaining unsorted portion, then swap it into position `i`.
+
+## Time & Space Complexity
+
+| Case | Time | Why |
+|------|------|-----|
+| Best | O(n²) | Always scans the full unsorted portion |
+| Average | O(n²) | Same — no shortcut possible |
+| Worst | O(n²) | Same behavior regardless of input |
+
+**Space complexity:** O(1) — sorts in place.
+
+**Key difference from Bubble Sort:** Selection sort makes at most `n - 1` swaps (one per pass), while bubble sort can make many swaps per pass. However, both make the same number of comparisons: O(n²).
+
+## When to Use It
+
+Selection sort is useful when **swap cost is high** (e.g., swapping large records) because it minimizes the number of swaps. In most other cases, more efficient algorithms like merge sort or quicksort are better choices.
+
+## Common Mistake
+
+Not initializing `min_idx = i` at the start of each outer loop iteration. If you forget this, the algorithm compares against a stale minimum from a previous pass:
+
+```python
+# Wrong — min_idx carries over from previous iteration
+min_idx = 0
+for i in range(n):
+    for j in range(i + 1, n):
+        ...
+
+# Correct — reset min_idx each pass
+for i in range(n):
+    min_idx = i
+    for j in range(i + 1, n):
+        ...
+```
+
+## What's Next?
+
+Selection sort finds the minimum and places it. **Insertion Sort** takes a different approach — it picks each element and inserts it into the correct position within the already-sorted portion, making it excellent for nearly sorted data.

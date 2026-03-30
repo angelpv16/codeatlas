@@ -1,0 +1,77 @@
+---
+title: "Bubble Sort"
+titleEs: "Bubble Sort"
+description: "The simplest sorting algorithm — compare adjacent elements and swap if out of order. Repeat until sorted."
+descriptionEs: "El algoritmo de ordenación más simple — compara elementos adyacentes e intercámbialos si están en orden incorrecto."
+order: 9
+section: "algorithms"
+level: "beginner"
+estimatedMinutes: 8
+tags: ["algorithms", "sorting", "bubble-sort"]
+hasAnimation: true
+publishedAt: 2024-01-09
+relatedConcepts: ["05-arrays-and-lists", "10-selection-sort"]
+---
+import BubbleSortVisualizer from '../../components/animations/BubbleSortVisualizer.astro';
+
+## What It Does
+
+**Bubble sort** repeatedly steps through the list, compares two adjacent elements, and swaps them if the left one is bigger. After each full pass, the largest unsorted element "bubbles up" to its correct position at the end.
+
+It's the simplest sorting algorithm to understand — and one of the slowest in practice. Its value is purely educational.
+
+## Real-World Analogy
+
+Imagine sorting a row of people by height. You walk down the line, and whenever you see a taller person standing before a shorter one, you swap them. After one full walk, the tallest person is at the end. Repeat for the rest until everyone is in order.
+
+## See It in Action
+
+<BubbleSortVisualizer />
+
+## Python Implementation
+
+```python
+def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+    return arr
+
+numbers = [64, 34, 25, 12, 22, 11, 90]
+print(bubble_sort(numbers))
+# [11, 12, 22, 25, 34, 64, 90]
+```
+
+The outer loop runs `n` times. The inner loop compares adjacent pairs, shrinking by one each pass because the last `i` elements are already sorted.
+
+## Time & Space Complexity
+
+| Case | Time | Why |
+|------|------|-----|
+| Best (already sorted) | O(n) | One pass with no swaps |
+| Average | O(n²) | Nested loops |
+| Worst (reverse sorted) | O(n²) | Maximum swaps every pass |
+
+**Space complexity:** O(1) — sorts in place, no extra memory needed.
+
+## When to Use It
+
+Almost never in production. Bubble sort is the slowest common sorting algorithm. Its real value is educational: it's the simplest sorting algorithm to understand and implement, making it a perfect starting point for learning about sorting.
+
+## Common Mistake
+
+Forgetting the `n - i - 1` bound on the inner loop. Without it, you compare elements that are already in their final sorted positions, wasting comparisons:
+
+```python
+# Wrong — compares already-sorted elements
+for j in range(0, n - 1):
+
+# Correct — skips the last i sorted elements
+for j in range(0, n - i - 1):
+```
+
+## What's Next?
+
+Bubble sort swaps many times per pass. **Selection Sort** takes a different approach — it finds the minimum element in each pass and places it directly, requiring far fewer swaps.
